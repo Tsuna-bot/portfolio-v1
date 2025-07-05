@@ -61,11 +61,13 @@ const SectionContent: React.FC<{
         pointerEvents: "none",
       }}
     >
-      <div className="w-screen h-screen flex items-center justify-center">
-        <div className="container mx-auto px-4 text-center">
+      <div className="w-screen h-screen flex items-center justify-center overflow-y-auto">
+        <div className="container mx-auto px-4 text-center py-8">
           <div
             className={
-              section.id === "contact" ? "w-full" : "max-w-4xl mx-auto"
+              section.id === "contact"
+                ? "w-full min-h-full"
+                : "max-w-4xl mx-auto"
             }
           >
             <div style={{ pointerEvents: isDragging ? "none" : "auto" }}>
@@ -1129,10 +1131,10 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           </div>
 
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-16 lg:gap-32">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-16 lg:gap-32 items-start">
               {/* Section de gauche - Informations de contact */}
-              <div className="space-y-8">
-                <div className="space-y-6">
+              <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-4 sm:space-y-6">
                   <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 font-heading">
                     Let's create something
                     <span
@@ -1279,8 +1281,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </div>
 
               {/* Section de droite - Formulaire de contact */}
-              <div className="space-y-6 sm:space-y-8">
-                <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+                <div className="space-y-3 sm:space-y-4 lg:space-y-6">
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 md:mb-8 font-heading">
                     Send me a
                     <span
