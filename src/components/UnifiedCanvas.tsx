@@ -1196,7 +1196,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       name="name"
                       value={form.name}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
                       placeholder="Your name"
                       required
                     />
@@ -1210,7 +1210,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       name="email"
                       value={form.email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
                       placeholder="your@email.com"
                       required
                     />
@@ -1225,7 +1225,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     name="title"
                     value={form.title}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
+                    className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
                     placeholder="Subject of your message"
                     required
                   />
@@ -1238,8 +1238,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     name="message"
                     value={form.message}
                     onChange={handleInputChange}
-                    rows={2}
-                    className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-sm"
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-sm"
                     placeholder="Your message..."
                     required
                   ></textarea>
@@ -1248,7 +1248,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full px-4 py-2 rounded-lg font-bold text-sm border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
+                    className="w-full px-6 py-4 rounded-lg font-bold text-base border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
                     style={{
                       backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                       borderColor: "var(--color-grid)",
