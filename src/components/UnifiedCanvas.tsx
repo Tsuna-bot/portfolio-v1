@@ -1163,8 +1163,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             </div>
             {/* Texte d'intro */}
             <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-2">
-              Ready to bring your ideas to life? I'm always excited to work on
-              new projects and collaborate with creative minds.
+              Ready to bring your ideas to life ?
             </div>
             {/* Formulaire de contact */}
             <div className="mb-3">
@@ -1384,7 +1383,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       </span>
                     </h3>
                     <p className="text-lg text-gray-300 leading-relaxed font-body">
-                      Ready to bring your ideas to life? I'm always excited to
+                      Ready to bring your ideas to life ? I'm always excited to
                       work on new projects and collaborate with creative minds.
                     </p>
                   </div>
