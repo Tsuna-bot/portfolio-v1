@@ -22,15 +22,34 @@ interface Section {
   content: React.ReactNode;
 }
 
-const UNITS_PER_SECTION = 7;
+// Hook pour obtenir l'espacement des sections en fonction de la taille d'écran
+const useUnitsPerSection = () => {
+  const [unitsPerSection, setUnitsPerSection] = React.useState(7);
+
+  React.useEffect(() => {
+    const updateUnits = () => {
+      const width = window.innerWidth;
+      if (width < 640) setUnitsPerSection(12); // Mobile
+      else if (width < 1024) setUnitsPerSection(9); // Tablette
+      else setUnitsPerSection(7); // Desktop
+    };
+
+    updateUnits();
+    window.addEventListener("resize", updateUnits);
+    return () => window.removeEventListener("resize", updateUnits);
+  }, []);
+
+  return unitsPerSection;
+};
 
 // Composant pour le contenu 2D d'une section
 const SectionContent: React.FC<{
   section: Section;
   index: number;
   isDragging: boolean;
-}> = ({ section, index, isDragging }) => {
-  const x = index * UNITS_PER_SECTION;
+  unitsPerSection: number;
+}> = ({ section, index, isDragging, unitsPerSection }) => {
+  const x = index * unitsPerSection;
 
   return (
     <Html
@@ -72,6 +91,7 @@ const SceneController: React.FC<{
   onAdobeFallingComplete: () => void;
   cmsFallingActive: boolean;
   onCmsFallingComplete: () => void;
+  unitsPerSection: number;
 }> = ({
   sections,
   onDragStateChange,
@@ -84,6 +104,7 @@ const SceneController: React.FC<{
   onAdobeFallingComplete,
   cmsFallingActive,
   onCmsFallingComplete,
+  unitsPerSection,
 }) => {
   const { camera } = useThree();
   const [isDragging, setIsDragging] = useState(false);
@@ -113,7 +134,7 @@ const SceneController: React.FC<{
 
       {/* Grille technique en arrière-plan */}
       <TechGrid
-        sceneWidth={sections.length * UNITS_PER_SECTION}
+        sceneWidth={sections.length * unitsPerSection}
         scrollOffset={scrollOffset}
       />
 
@@ -124,12 +145,13 @@ const SceneController: React.FC<{
           section={section}
           index={index}
           isDragging={isDragging}
+          unitsPerSection={unitsPerSection}
         />
       ))}
 
       {/* Cubes 3D en arrière-plan */}
       <AnimatedCubes
-        sceneWidth={sections.length * UNITS_PER_SECTION}
+        sceneWidth={sections.length * unitsPerSection}
         onDragStateChange={handleDragStateChange}
       />
 
@@ -795,6 +817,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
   showLoading,
 }) => {
   const location = useLocation();
+  const unitsPerSection = useUnitsPerSection();
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
@@ -1395,7 +1418,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
         (section) => section.id === "projects"
       );
       if (sectionIndex !== -1) {
-        const newTargetOffset = sectionIndex * UNITS_PER_SECTION;
+        const newTargetOffset = sectionIndex * unitsPerSection;
         setTargetScrollOffset(newTargetOffset);
         setScrollOffset(newTargetOffset);
         setCurrentSection(sectionIndex);
@@ -1406,7 +1429,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
 
   // Calculer la section actuelle basée sur le scroll
   useEffect(() => {
-    const sectionIndex = Math.round(scrollOffset / UNITS_PER_SECTION);
+    const sectionIndex = Math.round(scrollOffset / unitsPerSection);
     setCurrentSection(Math.max(0, Math.min(sectionIndex, sections.length - 1)));
   }, [scrollOffset]);
 
@@ -1551,7 +1574,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
         0,
         Math.min(
           scrollOffset + delta * 0.01,
-          (sections.length - 1) * UNITS_PER_SECTION
+          (sections.length - 1) * unitsPerSection
         )
       );
       setScrollOffset(newOffset);
@@ -1564,7 +1587,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
 
   // Fonction pour naviguer vers une section spécifique
   const handleSectionChange = (sectionIndex: number) => {
-    const newTargetOffset = sectionIndex * UNITS_PER_SECTION;
+    const newTargetOffset = sectionIndex * unitsPerSection;
     setTargetScrollOffset(newTargetOffset);
   };
 
@@ -1594,6 +1617,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           onAdobeFallingComplete={() => setAdobeFallingActive(false)}
           cmsFallingActive={cmsFallingActive}
           onCmsFallingComplete={() => setCmsFallingActive(false)}
+          unitsPerSection={unitsPerSection}
         />
       </Canvas>
 
