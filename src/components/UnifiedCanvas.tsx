@@ -320,56 +320,145 @@ const NavigationDots: React.FC<{
   currentSection: number;
   onSectionChange: (sectionIndex: number) => void;
 }> = ({ sections, currentSection, onSectionChange }) => {
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+  const [animatingButton, setAnimatingButton] = useState<string | null>(null);
+  const isMobile = viewportWidth < 640;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handlePrevious = () => {
+    if (currentSection > 0 && !animatingButton) {
+      setAnimatingButton("prev");
+      onSectionChange(currentSection - 1);
+      setTimeout(() => setAnimatingButton(null), 300);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentSection < sections.length - 1 && !animatingButton) {
+      setAnimatingButton("next");
+      onSectionChange(currentSection + 1);
+      setTimeout(() => setAnimatingButton(null), 300);
+    }
+  };
+
   return (
-    <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-50 mt-6">
-      <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 sm:px-5 py-2 sm:py-3 border border-white/10 transition-transform duration-300 hover:scale-150">
-        <div className="flex space-x-4 sm:space-x-4">
-          {sections.map((section, index) => (
-            <button
-              key={index}
-              onClick={() => onSectionChange(index)}
-              className="relative w-3 sm:w-3 h-3 sm:h-3 rounded-full transition-transform duration-300 hover:scale-110 group"
-              aria-label={`Aller à la section ${index + 1}`}
+    <>
+      {/* Boutons de navigation fléchés sur mobile */}
+      {isMobile && (
+        <>
+          {/* Bouton gauche */}
+          <button
+            onClick={handlePrevious}
+            disabled={currentSection === 0 || animatingButton !== null}
+            className={`fixed bottom-4 left-4 z-50 w-12 h-12 bg-orange-500/30 backdrop-blur-sm rounded-full border border-white/10 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${
+              animatingButton === "prev" ? "scale-95" : ""
+            }`}
+            aria-label="Section précédente"
+          >
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {/* Cercle pulsant pour le dot actif */}
-              {index === currentSection && (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+          {/* Bouton droit */}
+          <button
+            onClick={handleNext}
+            disabled={
+              currentSection === sections.length - 1 || animatingButton !== null
+            }
+            className={`fixed bottom-4 right-4 z-50 w-12 h-12 bg-orange-500/30 backdrop-blur-sm rounded-full border border-white/10 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${
+              animatingButton === "next" ? "scale-95" : ""
+            }`}
+            aria-label="Section suivante"
+          >
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </>
+      )}
+
+      {/* Dots de navigation */}
+      <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-50 mt-6">
+        <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 sm:px-5 py-2 sm:py-3 border border-white/10 transition-transform duration-300 hover:scale-150">
+          <div className="flex space-x-4 sm:space-x-4">
+            {sections.map((section, index) => (
+              <button
+                key={index}
+                onClick={() => onSectionChange(index)}
+                className="relative w-3 sm:w-3 h-3 sm:h-3 rounded-full transition-transform duration-300 hover:scale-110 group"
+                aria-label={`Aller à la section ${index + 1}`}
+              >
+                {/* Cercle pulsant pour le dot actif */}
+                {index === currentSection && (
+                  <div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      border: "1px solid var(--color-grid)",
+                      animation:
+                        "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                      transform: "scale(2.5)",
+                      zIndex: -1,
+                    }}
+                  />
+                )}
+
+                {/* Cercle central */}
                 <div
-                  className="absolute inset-0 rounded-full"
+                  className={`w-full h-full rounded-full transition-all duration-300 ${
+                    index === currentSection
+                      ? "bg-orange-500"
+                      : "hover:bg-orange-400"
+                  }`}
                   style={{
-                    border: "1px solid var(--color-grid)",
-                    animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                    transform: "scale(2.5)",
-                    zIndex: -1,
+                    backgroundColor:
+                      index === currentSection
+                        ? "var(--color-grid)"
+                        : "rgba(255, 122, 26, 0.3)",
                   }}
                 />
-              )}
 
-              {/* Cercle central */}
-              <div
-                className={`w-full h-full rounded-full transition-all duration-300 ${
-                  index === currentSection
-                    ? "bg-orange-500"
-                    : "hover:bg-orange-400"
-                }`}
-                style={{
-                  backgroundColor:
-                    index === currentSection
-                      ? "var(--color-grid)"
-                      : "rgba(255, 122, 26, 0.3)",
-                }}
-              />
-
-              {/* Pill avec le titre au survol */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                <div className="bg-black/80 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full whitespace-nowrap border border-white/20">
-                  {section.title}
+                {/* Pill avec le titre au survol */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                  <div className="bg-black/80 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full whitespace-nowrap border border-white/20">
+                    {section.title}
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
