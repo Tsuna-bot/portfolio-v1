@@ -1,0 +1,346 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  user-select: none;
+}
+
+/* Global styles */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  font-family: var(--font-body);
+}
+
+/* App container */
+.App {
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  background-color: #000000;
+}
+
+/* App container pour la page principale (UnifiedCanvas) */
+.App.main-page {
+  display: flex;
+  height: 100vh;
+}
+
+/* Hide scrollbar for webkit browsers (only on main page) */
+.main-page ::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox (only on main page) */
+.main-page * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Custom scrollbar styles for all browsers */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ff7a1a 0%, rgba(255, 122, 26, 0.8) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 122, 26, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(255, 122, 26, 1.2) 0%, #ff7a1a 100%);
+  border-color: rgba(255, 122, 26, 0.5);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #ff7a1a 0%, rgba(255, 122, 26, 0.6) 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Firefox scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ff7a1a rgba(0, 0, 0, 0.3);
+}
+
+/* Show scrollbar for project pages */
+.project-page ::-webkit-scrollbar {
+  display: block !important;
+  width: 12px !important;
+}
+
+.project-page ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.project-page ::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    #ff7a1a 0%,
+    rgba(255, 122, 26, 0.8) 100%
+  ) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 122, 26, 0.3) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.project-page ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 122, 26, 1.2) 0%,
+    #ff7a1a 100%
+  ) !important;
+  border-color: rgba(255, 122, 26, 0.5) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+.project-page ::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(
+    180deg,
+    #ff7a1a 0%,
+    rgba(255, 122, 26, 0.6) 100%
+  ) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Show scrollbar for Firefox on project pages */
+.project-page {
+  scrollbar-width: thin !important;
+  scrollbar-color: #ff7a1a rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Container adjustments */
+.container {
+  max-width: 100%;
+  padding: 2rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Animation de pulsation pour les dots de navigation */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.8);
+  }
+}
+
+/* Animation de pulsation pour la loading page */
+@keyframes loadingPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: loadingPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+:root {
+  --color-bg: #000;
+  --color-grid: #ff7a1a;
+  --color-grid-rgb: 255, 122, 26;
+  --color-grid-opacity: 0.05;
+  --font-heading: "shuttleblock", sans-serif;
+  --font-body: "helvetica-lt-pro", sans-serif;
+}
+
+.tech-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  height: 100vh;
+  width: 100%;
+  background: repeating-linear-gradient(
+      to right,
+      rgba(var(--color-grid-rgb), var(--color-grid-opacity)) 0 1px,
+      transparent 1px 40px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(var(--color-grid-rgb), var(--color-grid-opacity)) 0 1px,
+      transparent 1px 40px
+    ),
+    var(--color-bg);
+}
+
+/* Animation des titres hero avec Splitting.js - sortir du bas du conteneur */
+.hero-title-container {
+  position: relative;
+}
+
+.hero-title-line {
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+  height: auto;
+}
+
+/* S'assurer que tous les titres hero sont invisibles par défaut */
+.hero-title,
+.hero-title h1,
+.hero-title h2,
+.hero-title p {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.hero-title .word {
+  opacity: 0 !important;
+  transform: translateY(200%) !important;
+  transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  position: relative;
+  display: inline-block;
+  visibility: visible !important;
+}
+
+.hero-title .word.animate {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  visibility: visible !important;
+}
+
+/* Rendre les titres visibles quand l'animation commence */
+.hero-title.animate,
+.hero-title h1.animate,
+.hero-title h2.animate,
+.hero-title p.animate {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: bold;
+}
+
+p,
+span,
+div {
+  font-family: var(--font-body);
+}
+
+/* Forcer font-heading sur les titres hero */
+.hero-title .text-center.font-heading,
+.hero-title .text-center.font-heading div,
+.hero-title h2,
+.hero-title h2 div {
+  font-family: "shuttleblock", sans-serif !important;
+}
+
+/* Styles pour le cube 3D de la loading page */
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 3s linear infinite;
+}
+
+/* Cube 3D loading page */
+.cube {
+  width: 64px;
+  height: 64px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cube-spin 3s linear infinite;
+}
+
+@keyframes cube-spin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.cube .face {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #ff9900 60%, #ff6600 100%);
+  border: 2px solid #ffb347;
+  box-shadow: 0 0 16px 2px rgba(255, 140, 0, 0.25);
+  opacity: 0.98;
+}
+.cube .front {
+  transform: rotateY(0deg) translateZ(32px);
+}
+.cube .back {
+  transform: rotateY(180deg) translateZ(32px);
+}
+.cube .right {
+  transform: rotateY(90deg) translateZ(32px);
+}
+.cube .left {
+  transform: rotateY(-90deg) translateZ(32px);
+}
+.cube .top {
+  transform: rotateX(90deg) translateZ(32px);
+}
+.cube .bottom {
+  transform: rotateX(-90deg) translateZ(32px);
+}

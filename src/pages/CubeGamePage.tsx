@@ -1,0 +1,729 @@
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useRef, useState, useEffect } from "react";
+import * as THREE from "three";
+import type { Mesh } from "three";
+import { Physics, RigidBody } from "@react-three/rapier";
+
+const HOLO_COL = "#ffef36";
+
+// Composant AimCurve (courbe de visée correspondant à la vraie physique)
+const AimCurve = ({ angle, power }: { angle: number; power: number }) => {
+  const meshRef = useRef<Mesh>(null);
+
+  // Calcul basé sur la vraie physique du jeu
+  const THROW_SPEED = 10;
+  const speed = THROW_SPEED * power;
+  const vx = Math.sin(angle) * speed;
+  const vz = Math.cos(angle) * speed;
+  const vy = (power - 1) * 8.0;
+
+  const start = new THREE.Vector3(0, 1.2, 4);
+
+  // Point intermédiaire (après 0.3 secondes)
+  const t1 = 0.3;
+  const midX = vx * t1;
+  const midY = 1.2 + vy * t1 - 0.5 * 9.81 * t1 * t1; // Physique avec gravité
+  const midZ = 4 + vz * t1;
+  const mid = new THREE.Vector3(midX, midY, midZ);
+
+  // Point final (après 0.6 secondes)
+  const t2 = 0.6;
+  const endX = vx * t2;
+  const endY = 1.2 + vy * t2 - 0.5 * 9.81 * t2 * t2; // Physique avec gravité
+  const endZ = 4 + vz * t2;
+  const end = new THREE.Vector3(endX, endY, endZ);
+
+  // Courbe basée sur la vraie physique
+  const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+
+  useFrame(({ clock }) => {
+    if (meshRef.current && meshRef.current.material) {
+      const mat = meshRef.current.material as THREE.MeshPhysicalMaterial;
+      if ("emissiveIntensity" in mat) {
+        mat.emissiveIntensity =
+          1.5 + Math.sin(clock.getElapsedTime() * 3) * 0.6;
+      }
+    }
+  });
+
+  return (
+    <mesh ref={meshRef}>
+      <tubeGeometry args={[curve, 64, 0.015, 8, false]} />
+      <meshPhysicalMaterial
+        color="#ff6b00"
+        emissive="#ff6b00"
+        opacity={0.7}
+        transparent
+        transmission={0.9}
+        ior={1.3}
+        metalness={1}
+        roughness={0.05}
+        clearcoat={1}
+        clearcoatRoughness={0.02}
+        thickness={0.3}
+        emissiveIntensity={1.5}
+      />
+    </mesh>
+  );
+};
+
+const INITIAL_CUBE_POS: [number, number, number] = [0, 1.2, 4];
+const THROW_SPEED = 10;
+
+const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
+  const { camera } = useThree();
+  const [isAiming, setIsAiming] = useState(false);
+  const [aimAngle, setAimAngle] = useState(0); // 0 = tout droit
+  const [power, setPower] = useState(1);
+  const [startX, setStartX] = useState<number | null>(null);
+  const [startY, setStartY] = useState<number | null>(null);
+  const [projectiles, setProjectiles] = useState<
+    Array<{
+      id: number;
+      start: [number, number, number];
+      velocity: [number, number, number];
+      onGround: boolean;
+    }>
+  >([]);
+  const [targets, setTargets] = useState<
+    Array<{
+      id: number;
+      position: [number, number, number];
+      isActive: boolean;
+      rotation: [number, number, number];
+    }>
+  >([
+    {
+      id: 1,
+      position: [0, 2.5, 12],
+      isActive: true,
+      rotation: [Math.PI / 2, 0, 0],
+    },
+  ]);
+  const nextTargetId = useRef(2);
+  const nextId = useRef(0);
+  const cubeRef = useRef<Mesh>(null);
+
+  useFrame(() => {
+    const target = new THREE.Vector3(0, 2, 2);
+    camera.position.lerp(target, 0.08);
+    camera.lookAt(0, 1, 26);
+    if (cubeRef.current) cubeRef.current.position.set(...INITIAL_CUBE_POS);
+  });
+
+  // Gestion automatique de la suppression des cubes au sol
+  useEffect(() => {
+    const onGroundProjectiles = projectiles.filter((p) => p.onGround);
+    if (onGroundProjectiles.length > 10) {
+      // Supprime les plus anciens (garder max 10 au sol)
+      const toRemove = onGroundProjectiles.slice(
+        0,
+        onGroundProjectiles.length - 10
+      );
+      setProjectiles((prev) => prev.filter((p) => !toRemove.includes(p)));
+    }
+  }, [projectiles]);
+
+  // Gestion automatique de la suppression des cibles au sol
+  useEffect(() => {
+    const onGroundTargets = targets.filter((t) => !t.isActive);
+    if (onGroundTargets.length > 8) {
+      // Supprime les plus anciens (garder max 8 au sol)
+      const toRemove = onGroundTargets.slice(0, onGroundTargets.length - 8);
+      setTargets((prev) => prev.filter((t) => !toRemove.includes(t)));
+    }
+  }, [targets]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setIsAiming(true);
+    setStartX(e.clientX);
+    setStartY(e.clientY);
+    setPower(1);
+  };
+
+  useEffect(() => {
+    if (!isAiming) return;
+    const handleGlobalPointerMove = (e: PointerEvent) => {
+      if (startX === null || startY === null) return;
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+      // Angle (horizontal)
+      const deltaX = clientX - startX;
+      let angle = (deltaX / 200) * (Math.PI / 4); // max +/- 45°
+      angle = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, angle));
+      setAimAngle(angle);
+      // Puissance (vertical)
+      const deltaY = clientY - startY;
+      let pow = 1 + deltaY / 100; // Plus sensible (180 → 100) pour un contrôle plus fin
+      pow = Math.max(0.3, Math.min(2.0, pow)); // Limites étendues (0.5-1.5 → 0.3-2.0) pour plus de variété
+      setPower(pow);
+    };
+    window.addEventListener("pointermove", handleGlobalPointerMove);
+    return () =>
+      window.removeEventListener("pointermove", handleGlobalPointerMove);
+  }, [isAiming, startX, startY]);
+
+  useEffect(() => {
+    if (!isAiming) return;
+    const handleGlobalPointerUp = () => {
+      // Au tir, ajoute un nouveau projectile dynamique
+      const speed = THROW_SPEED * power;
+      const vx = Math.sin(aimAngle) * speed;
+      const vz = Math.cos(aimAngle) * speed;
+      const vy = (power - 1) * 8.0; // Augmenté de 2.0 à 8.0 pour plus de hauteur avec THROW_SPEED = 10
+
+      console.log("Tir détecté!", {
+        power,
+        aimAngle: aimAngle * (180 / Math.PI) + "°",
+        speed,
+        velocity: [vx, vy, vz],
+      });
+
+      setProjectiles((prev) => [
+        ...prev,
+        {
+          id: nextId.current++,
+          start: [...INITIAL_CUBE_POS] as [number, number, number],
+          velocity: [vx, vy, vz] as [number, number, number],
+          onGround: false,
+        },
+      ]);
+      setIsAiming(false);
+      setStartX(null);
+      setStartY(null);
+      setPower(1);
+    };
+    window.addEventListener("pointerup", handleGlobalPointerUp);
+    return () => window.removeEventListener("pointerup", handleGlobalPointerUp);
+  }, [isAiming, aimAngle, power]);
+
+  const handleProjectileCollision = (projectileId: number) => {
+    setProjectiles((prev) =>
+      prev.map((p) => (p.id === projectileId ? { ...p, onGround: true } : p))
+    );
+  };
+
+  const handleTargetHit = (
+    targetId: number,
+    hitPoint?: [number, number, number]
+  ) => {
+    console.log("Cible touchée!", targetId, "Point d'impact:", hitPoint);
+
+    // Notifie le composant parent qu'une cible a été touchée
+    onTargetHit();
+
+    // Désactive la cible touchée en gardant sa rotation actuelle
+    setTargets((prev) =>
+      prev.map((t) =>
+        t.id === targetId
+          ? { ...t, isActive: false, rotation: t.rotation } // Garde la rotation actuelle
+          : t
+      )
+    );
+
+    // Génère une nouvelle position aléatoire en évitant la cible qui vient de tomber
+    const hitTarget = targets.find((t) => t.id === targetId);
+    let newPosition: [number, number, number];
+    let attempts = 0;
+    const maxAttempts = 50;
+
+    do {
+      const newX = (Math.random() - 0.5) * 8; // -4 à +4 (plus large)
+      const newY = 2.0 + Math.random() * 2; // 2.0 à 4.0 (hauteur raisonnable)
+      const newZ = 12 + Math.random() * 6; // 12 à 18 (beaucoup plus loin)
+      newPosition = [newX, newY, newZ];
+      attempts++;
+
+      // Vérifie la distance avec la cible qui vient de tomber
+      if (hitTarget) {
+        const distance = Math.sqrt(
+          Math.pow(newX - hitTarget.position[0], 2) +
+            Math.pow(newY - hitTarget.position[1], 2) +
+            Math.pow(newZ - hitTarget.position[2], 2)
+        );
+
+        // Si la distance est suffisante (> 4 unités), on accepte la position
+        if (distance > 4) {
+          break;
+        }
+      } else {
+        // Si pas de cible trouvée, on accepte la position
+        break;
+      }
+    } while (attempts < maxAttempts);
+
+    // Crée une nouvelle cible active
+    setTargets((prev) => [
+      ...prev,
+      {
+        id: nextTargetId.current++,
+        position: newPosition,
+        isActive: true,
+        rotation: [Math.PI / 2, 0, 0],
+      },
+    ]);
+  };
+
+  return (
+    <Physics gravity={[0, -9.81, 0]}>
+      {/* Sol */}
+      <RigidBody type="fixed">
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 20]}>
+          <planeGeometry args={[50, 50]} />
+          <meshStandardMaterial color="#18181b" />
+        </mesh>
+      </RigidBody>
+      {/* Grille */}
+      <gridHelper
+        args={[50, 40, "#ff7a1a", "#ff7a1a"]}
+        position={[0, 0.01, 20]}
+      />
+      {/* Cibles holographiques */}
+      {targets.map((target) => (
+        <RigidBody
+          key={target.id}
+          type={target.isActive ? "fixed" : "dynamic"}
+          position={target.position}
+          colliders="cuboid"
+          friction={0.1}
+          restitution={0.3}
+          mass={target.isActive ? undefined : 0.05}
+          ccd={true}
+          onCollisionEnter={(e) => {
+            if (target.isActive) {
+              console.log("Collision détectée avec cible", target.id, e);
+              // Pour l'instant, on utilise la position de la cible comme point d'impact
+              // On pourrait améliorer cela avec des raycasts plus précis
+              const hitPoint: [number, number, number] = target.position;
+              handleTargetHit(target.id, hitPoint);
+            }
+          }}
+        >
+          {/* Collider invisible plus grand pour améliorer la détection */}
+          <mesh visible={false}>
+            <cylinderGeometry args={[1.2, 1.2, 0.8, 16]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
+          <mesh rotation={target.rotation}>
+            <cylinderGeometry args={[0.8, 0.8, 0.3, 32]} />
+            <meshPhysicalMaterial
+              color={HOLO_COL}
+              emissive={HOLO_COL}
+              emissiveIntensity={target.isActive ? 0.8 : 0.2}
+              metalness={1}
+              roughness={0.02}
+              clearcoat={1}
+              clearcoatRoughness={0.02}
+              transmission={0.9}
+              ior={1.4}
+              thickness={0.3}
+              envMapIntensity={2}
+            />
+          </mesh>
+        </RigidBody>
+      ))}
+      {/* Cube orange de main (pour viser) */}
+      <mesh
+        ref={cubeRef}
+        position={INITIAL_CUBE_POS}
+        onPointerDown={handlePointerDown}
+      >
+        <boxGeometry args={[0.2, 0.2, 0.2]} />
+        <meshPhysicalMaterial
+          color="#ff9800"
+          emissive="#ff9800"
+          emissiveIntensity={0.7}
+          metalness={0.8}
+          roughness={0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.05}
+          envMapIntensity={1.5}
+        />
+      </mesh>
+      {/* Projectiles dynamiques */}
+      {projectiles.map((proj) => (
+        <RigidBody
+          key={proj.id}
+          type="dynamic"
+          position={proj.start}
+          colliders="cuboid"
+          linearVelocity={proj.velocity}
+          friction={0.1}
+          restitution={0.3}
+          mass={8}
+          ccd={true}
+          onCollisionEnter={() => handleProjectileCollision(proj.id)}
+        >
+          <mesh>
+            <boxGeometry args={[0.2, 0.2, 0.2]} />
+            <meshPhysicalMaterial
+              color="#ff9800"
+              emissive="#ff9800"
+              emissiveIntensity={0.7}
+              metalness={0.8}
+              roughness={0.1}
+              clearcoat={1}
+              clearcoatRoughness={0.05}
+              envMapIntensity={1.5}
+            />
+          </mesh>
+        </RigidBody>
+      ))}
+      {/* Courbe de visée holographique avec puissance */}
+      {isAiming && <AimCurve angle={aimAngle} power={power} />}
+    </Physics>
+  );
+};
+
+// Composant Prompt
+const Prompt = ({
+  onClose,
+  setIsDoubleScore,
+  setIsTenScore,
+}: {
+  onClose: () => void;
+  setIsDoubleScore: (b: boolean) => void;
+  setIsTenScore: (b: boolean) => void;
+}) => {
+  const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [showMsg, setShowMsg] = useState(false);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "Enter" && value === "x2") {
+        setIsDoubleScore(true);
+        setIsTenScore(false);
+        setShowMsg(true);
+        setTimeout(() => setShowMsg(false), 2000);
+      }
+      if (e.key === "Enter" && value === "x10") {
+        setIsDoubleScore(false);
+        setIsTenScore(true);
+        setShowMsg(true);
+        setTimeout(() => setShowMsg(false), 2000);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, value]);
+
+  useEffect(() => {
+    // Le mode x2 n'est appliqué que quand on appuie sur Entrée
+    // setIsDoubleScore(value === "x2");
+  }, [value, setIsDoubleScore]);
+
+  return (
+    <div
+      className="fixed bottom-6 left-6 z-[100] bg-black/90 border border-orange-400 rounded-xl shadow-xl p-4 flex flex-col gap-2 min-w-[220px]"
+      style={{ backdropFilter: "blur(6px)" }}
+    >
+      <label className="text-orange-300 text-sm font-bold mb-1">
+        Hi there !
+      </label>
+      <input
+        ref={inputRef}
+        className="bg-black/60 border border-orange-400 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-orange-400"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      {showMsg && (
+        <div className="text-orange-400 text-xs mt-1 animate-pulse">
+          Have fun
+        </div>
+      )}
+      <div className="flex gap-2 mt-2">
+        <button
+          className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm font-bold"
+          onClick={onClose}
+        >
+          Fermer
+        </button>
+        <button
+          className="px-3 py-1 bg-orange-400 text-white rounded hover:bg-orange-500 text-sm font-bold"
+          onClick={() => {
+            setIsDoubleScore(false);
+            setIsTenScore(false);
+          }}
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const CubeGame = () => {
+  const [resetTrigger, setResetTrigger] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [score, setScore] = useState(0);
+  const [gameActive, setGameActive] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [showFinalScore, setShowFinalScore] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isDoubleScore, setIsDoubleScore] = useState(false);
+  const [isTenScore, setIsTenScore] = useState(false);
+
+  const handleStartGame = () => {
+    setGameStarted(true);
+    setCountdown(3);
+    setTimeLeft(30);
+    setScore(0);
+  };
+
+  const handleReset = () => {
+    setResetTrigger((prev) => prev + 1);
+    setTimeLeft(30);
+    setScore(0);
+    setCountdown(3);
+    setGameActive(false);
+    setShowFinalScore(false);
+  };
+
+  // Décompte de 3 secondes
+  useEffect(() => {
+    if (countdown <= 0) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          setGameActive(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  // Timer de 30 secondes
+  useEffect(() => {
+    if (!gameActive) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setGameActive(false);
+          setTimeout(() => {
+            setShowFinalScore(true);
+          }, 500);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameActive]);
+
+  // Afficher le prompt si F10
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F10") {
+        setShowPrompt(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  return (
+    <div className="w-full min-h-screen relative">
+      {/* Bouton de retour */}
+      <button
+        onClick={() => (window.location.href = "/")}
+        className="absolute top-6 left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-6 py-3 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+        aria-label="Back to home"
+      >
+        ← Back
+      </button>
+
+      {/* Écran d'accueil avec instructions */}
+      {!gameStarted && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-16 py-10 rounded-xl shadow-2xl backdrop-blur-sm min-w-[400px] max-w-2xl mx-4">
+            {/* Effet holographique de fond */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="relative z-10">
+              <div className="text-left space-y-4 mb-10">
+                <h2 className="text-2xl font-bold text-white mb-3">
+                  How to play:
+                </h2>
+                <div className="space-y-3 text-lg font-semibold">
+                  <p>
+                    • <span className="text-white">Click and hold</span> on the
+                    orange cube to aim
+                  </p>
+                  <p>
+                    • <span className="text-white">Move the mouse</span> to
+                    adjust angle and power
+                  </p>
+                  <p>
+                    • <span className="text-white">Release</span> to shoot the
+                    projectile
+                  </p>
+                  <p>
+                    • <span className="text-white">Hit the yellow targets</span>{" "}
+                    floating in the air to score points
+                  </p>
+                  <p>
+                    • <span className="text-white">30 seconds</span> to achieve
+                    the best score!
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={handleStartGame}
+                  className="bg-orange-500 text-white px-6 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg"
+                >
+                  Start
+                </button>
+                <button
+                  onClick={() => (window.location.href = "/")}
+                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-6 py-3 rounded-full font-bold shadow-lg"
+                >
+                  ← Back
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Décompte */}
+      {gameStarted && countdown > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+          <div className="text-[20rem] font-black text-orange-400 animate-pulse select-none">
+            {countdown}
+          </div>
+        </div>
+      )}
+
+      {/* Bouton de reset (visible seulement pendant le jeu actif) */}
+      {gameStarted && gameActive && (
+        <button
+          onClick={handleReset}
+          className="absolute top-6 right-6 z-50 bg-orange-500 text-white px-6 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+          aria-label="Reset game"
+        >
+          Reset
+        </button>
+      )}
+
+      {/* Scoreboard: always visible during game, animates position/zoom, content changes */}
+      {gameStarted && (
+        <div
+          className={`absolute z-50 transition-all duration-1000 ${
+            showFinalScore
+              ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-150"
+              : "top-6 left-1/2 transform -translate-x-1/2 scale-100"
+          }`}
+        >
+          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-16 py-6 rounded-xl shadow-2xl backdrop-blur-sm min-w-[400px]">
+            {/* Effet holographique de fond */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.2),transparent_50%)] rounded-xl"></div>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
+
+            <div className="relative flex gap-20 items-center justify-center">
+              {!showFinalScore ? (
+                <>
+                  <div className="text-center">
+                    <div
+                      className="text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                      style={{ fontFamily: "Shutteblock, monospace" }}
+                    >
+                      {timeLeft}s
+                    </div>
+                    <div className="text-sm font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                      TIME
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div
+                      className="text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                      style={{ fontFamily: "Shutteblock, monospace" }}
+                    >
+                      {score}
+                    </div>
+                    <div className="text-sm font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                      TARGETS
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <div
+                    className="text-3xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
+                    style={{ fontFamily: "Shutteblock, monospace" }}
+                  >
+                    Good job!
+                  </div>
+                  <div
+                    className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                    style={{ fontFamily: "Shutteblock, monospace" }}
+                  >
+                    {score} targets in 30s
+                  </div>
+                  <div className="flex gap-4 justify-center mt-4">
+                    <button
+                      onClick={handleReset}
+                      className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm"
+                    >
+                      Play Again
+                    </button>
+                    <button
+                      onClick={() => (window.location.href = "/")}
+                      className="bg-[#18181b] border border-orange-500 text-orange-400 px-4 py-2 rounded-lg font-bold hover:bg-orange-500 hover:text-white transition-colors text-sm"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPrompt && (
+        <Prompt
+          onClose={() => setShowPrompt(false)}
+          setIsDoubleScore={setIsDoubleScore}
+          setIsTenScore={setIsTenScore}
+        />
+      )}
+
+      <Canvas
+        camera={{ position: [0, 2, 2], fov: 60 }}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          pointerEvents: gameStarted && gameActive ? "auto" : "none",
+          background: "transparent",
+          zIndex: 10,
+        }}
+      >
+        <Scene
+          key={resetTrigger}
+          onTargetHit={() =>
+            setScore((prev) => prev + (isTenScore ? 10 : isDoubleScore ? 2 : 1))
+          }
+        />
+      </Canvas>
+    </div>
+  );
+};
+
+export default CubeGame;
