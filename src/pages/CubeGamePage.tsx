@@ -544,7 +544,7 @@ const CubeGame = () => {
       {/* Bouton de retour */}
       <button
         onClick={() => (window.location.href = "/")}
-        className="absolute top-4 left-2 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+        className="absolute top-6 left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
         aria-label="Retour à l'accueil"
       >
         ← Back
@@ -644,7 +644,7 @@ const CubeGame = () => {
       {gameStarted && gameActive && (
         <button
           onClick={handleReset}
-          className="absolute top-4 right-2 z-50 bg-orange-500 text-white px-4 py-2 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+          className="absolute top-6 right-6 z-50 bg-orange-500 text-white px-4 py-2 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
           aria-label="Réinitialiser le jeu"
         >
           Reset
