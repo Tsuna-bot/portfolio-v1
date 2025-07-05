@@ -1142,9 +1142,9 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
       content: (
         <>
           {/* Version mobile */}
-          <div className="block lg:hidden w-full max-w-2xl mx-auto px-2">
+          <div className="block lg:hidden w-full max-w-2xl mx-auto px-2 -mt-8">
             {/* Titre */}
-            <div className="text-center mb-3">
+            <div className="text-center mb-2">
               <div className="text-xl font-bold text-white mb-1 font-heading">
                 Contact
               </div>
@@ -1154,12 +1154,12 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               ></div>
             </div>
             {/* Texte d'intro */}
-            <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-3">
+            <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-2">
               Ready to bring your ideas to life? I'm always excited to work on
               new projects and collaborate with creative minds.
             </div>
             {/* Formulaire de contact */}
-            <div className="mb-4">
+            <div className="mb-3">
               <form className="space-y-3" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="group">
@@ -1171,7 +1171,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       name="name"
                       value={form.name}
                       onChange={handleInputChange}
-                      className="w-full px-2 py-1.5 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-xs"
+                      className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
                       placeholder="Your name"
                       required
                     />
@@ -1185,7 +1185,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       name="email"
                       value={form.email}
                       onChange={handleInputChange}
-                      className="w-full px-2 py-1.5 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-xs"
+                      className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
                       placeholder="your@email.com"
                       required
                     />
@@ -1200,7 +1200,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     name="title"
                     value={form.title}
                     onChange={handleInputChange}
-                    className="w-full px-2 py-1.5 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-xs"
+                    className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm"
                     placeholder="Subject of your message"
                     required
                   />
@@ -1214,7 +1214,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     value={form.message}
                     onChange={handleInputChange}
                     rows={2}
-                    className="w-full px-2 py-1.5 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-xs"
+                    className="w-full px-3 py-2 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-sm"
                     placeholder="Your message..."
                     required
                   ></textarea>
@@ -1223,7 +1223,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full px-3 py-1.5 rounded-lg font-bold text-xs border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
+                    className="w-full px-4 py-2 rounded-lg font-bold text-sm border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
                     style={{
                       backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                       borderColor: "var(--color-grid)",
@@ -1257,11 +1257,11 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </form>
             </div>
             {/* Connect With Me */}
-            <div className="pt-1 pb-2">
+            <div className="pt-1 pb-1">
               <h4 className="text-sm font-semibold text-white mb-1 font-heading text-center">
                 Connect With Me
               </h4>
-              <div className="grid grid-cols-2 gap-2 pb-4">
+              <div className="grid grid-cols-2 gap-2 pb-2">
                 {/* LinkedIn */}
                 <a
                   href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
@@ -1305,7 +1305,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </div>
             </div>
             {/* Grille Location & Available for côte à côte - repositionnée en bas */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 -mb-4">
               {/* Location */}
               <div className="group flex items-center justify-center space-x-2 p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
                 <div

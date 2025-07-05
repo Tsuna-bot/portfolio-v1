@@ -285,7 +285,7 @@ const ProjectsContainer: React.FC<ProjectsContainerProps> = () => {
   return (
     <>
       <div className="text-center mb-16">
-        <div className="text-4xl md:text-5xl font-bold text-white mb-4 font-heading">
+        <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-heading">
           Projects
         </div>
         <div
