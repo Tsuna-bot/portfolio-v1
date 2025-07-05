@@ -127,9 +127,9 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
   // Gestion automatique de la suppression des cibles au sol
   useEffect(() => {
     const onGroundTargets = targets.filter((t) => !t.isActive);
-    if (onGroundTargets.length > 8) {
-      // Supprime les plus anciens (garder max 8 au sol)
-      const toRemove = onGroundTargets.slice(0, onGroundTargets.length - 8);
+    if (onGroundTargets.length > 2) {
+      // Supprime les plus anciens (garder max 2 au sol)
+      const toRemove = onGroundTargets.slice(0, onGroundTargets.length - 2);
       setTargets((prev) => prev.filter((t) => !toRemove.includes(t)));
     }
   }, [targets]);
@@ -560,44 +560,67 @@ const CubeGame = () => {
             <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
             <div className="relative z-10">
-              <div className="text-left space-y-4 mb-8 sm:mb-10">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
+              <div className="text-left space-y-6 mb-8 sm:mb-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 text-center">
                   How to play:
                 </h2>
-                <div className="space-y-2 sm:space-y-3 text-base sm:text-lg font-semibold">
-                  <p>
-                    • <span className="text-white">Tap and hold</span> on the
-                    orange cube to aim
-                  </p>
-                  <p>
-                    • <span className="text-white">Move your finger</span> to
-                    adjust angle and power
-                  </p>
-                  <p>
-                    • <span className="text-white">Release</span> to shoot the
-                    projectile
-                  </p>
-                  <p>
-                    • <span className="text-white">Hit the yellow targets</span>{" "}
-                    floating in the air to score points
-                  </p>
-                  <p>
-                    • <span className="text-white">30 seconds</span> to achieve
-                    the best score!
-                  </p>
+                <div className="space-y-4 sm:space-y-5 text-base sm:text-lg">
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">
+                        Tap and hold
+                      </span>{" "}
+                      on the orange cube to aim
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">
+                        Move your finger
+                      </span>{" "}
+                      to adjust angle and power
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">Release</span>{" "}
+                      to shoot the projectile
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">
+                        Hit the yellow targets
+                      </span>{" "}
+                      floating in the air to score points
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">
+                        30 seconds
+                      </span>{" "}
+                      to achieve the best score!
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <button
                   onClick={handleStartGame}
-                  className="bg-orange-500 text-white w-full sm:w-auto px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base sm:text-lg"
+                  className="bg-orange-500 text-white w-full sm:w-32 px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base sm:text-lg"
                   aria-label="Démarrer le jeu"
                 >
                   Start
                 </button>
                 <button
                   onClick={() => (window.location.href = "/")}
-                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full sm:w-auto px-4 py-3 rounded-full font-bold shadow-lg text-base sm:text-lg"
+                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full sm:w-32 px-4 py-3 rounded-full font-bold shadow-lg text-base sm:text-lg"
                   aria-label="Retour à l'accueil"
                 >
                   ← Back
