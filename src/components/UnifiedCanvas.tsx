@@ -865,6 +865,14 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
     message: string;
   } | null>(null);
 
+  // Variables pour le swipe mobile
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(
+    null
+  );
+
   const handleDragStateChange = (isDragging: boolean) => {
     setIsDragging(isDragging);
   };
@@ -1811,8 +1819,64 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
     setTargetScrollOffset(newTargetOffset);
   };
 
+  // Gestionnaires pour le swipe mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.targetTouches[0]) {
+      setTouchStart({
+        x: e.targetTouches[0].clientX,
+        y: e.targetTouches[0].clientY,
+      });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.targetTouches[0]) {
+      setTouchEnd({
+        x: e.targetTouches[0].clientX,
+        y: e.targetTouches[0].clientY,
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distanceX = touchStart.x - touchEnd.x;
+    const distanceY = touchStart.y - touchEnd.y;
+    const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+    // Seuil minimum pour considérer un swipe (50px)
+    if (isHorizontalSwipe && Math.abs(distanceX) > 50) {
+      const currentSectionIndex = Math.round(scrollOffset / unitsPerSection);
+      let newSectionIndex = currentSectionIndex;
+
+      if (distanceX > 0) {
+        // Swipe vers la gauche (section suivante)
+        newSectionIndex = Math.min(
+          currentSectionIndex + 1,
+          sections.length - 1
+        );
+      } else {
+        // Swipe vers la droite (section précédente)
+        newSectionIndex = Math.max(currentSectionIndex - 1, 0);
+      }
+
+      const newTargetOffset = newSectionIndex * unitsPerSection;
+      setTargetScrollOffset(newTargetOffset);
+    }
+
+    // Reset des positions
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
   return (
-    <div className="w-screen h-screen">
+    <div
+      className="w-screen h-screen"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <Canvas
         camera={{ position: [0, 0, 10], fov: 75 }}
         style={{
