@@ -17,21 +17,21 @@ const AimCurve = ({ angle, power }: { angle: number; power: number }) => {
   const vz = Math.cos(angle) * speed;
   const vy = (power - 1) * 8.0;
 
-  const start = new THREE.Vector3(0, 1.2, 4);
+  const start = new THREE.Vector3().set(0, 1.2, 4);
 
   // Point intermédiaire (après 0.3 secondes)
   const t1 = 0.3;
   const midX = vx * t1;
   const midY = 1.2 + vy * t1 - 0.5 * 9.81 * t1 * t1; // Physique avec gravité
   const midZ = 4 + vz * t1;
-  const mid = new THREE.Vector3(midX, midY, midZ);
+  const mid = new THREE.Vector3().set(midX, midY, midZ);
 
   // Point final (après 0.6 secondes)
   const t2 = 0.6;
   const endX = vx * t2;
   const endY = 1.2 + vy * t2 - 0.5 * 9.81 * t2 * t2; // Physique avec gravité
   const endZ = 4 + vz * t2;
-  const end = new THREE.Vector3(endX, endY, endZ);
+  const end = new THREE.Vector3().set(endX, endY, endZ);
 
   // Courbe basée sur la vraie physique
   const curve = new THREE.CatmullRomCurve3([start, mid, end]);
@@ -105,7 +105,7 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
   const cubeRef = useRef<Mesh>(null);
 
   useFrame(() => {
-    const target = new THREE.Vector3(0, 2, 2);
+    const target = new THREE.Vector3().set(0, 2, 2);
     camera.position.lerp(target, 0.08);
     camera.lookAt(0, 1, 26);
     if (cubeRef.current) cubeRef.current.position.set(...INITIAL_CUBE_POS);
@@ -172,13 +172,6 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
       const vz = Math.cos(aimAngle) * speed;
       const vy = (power - 1) * 8.0; // Augmenté de 2.0 à 8.0 pour plus de hauteur avec THROW_SPEED = 10
 
-      console.log("Tir détecté!", {
-        power,
-        aimAngle: aimAngle * (180 / Math.PI) + "°",
-        speed,
-        velocity: [vx, vy, vz],
-      });
-
       setProjectiles((prev) => [
         ...prev,
         {
@@ -203,12 +196,7 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
     );
   };
 
-  const handleTargetHit = (
-    targetId: number,
-    hitPoint?: [number, number, number]
-  ) => {
-    console.log("Cible touchée!", targetId, "Point d'impact:", hitPoint);
-
+  const handleTargetHit = (targetId: number) => {
     // Notifie le composant parent qu'une cible a été touchée
     onTargetHit();
 
@@ -227,8 +215,20 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
     let attempts = 0;
     const maxAttempts = 50;
 
+    // Calcul dynamique du viewport visible à la profondeur cible
+    const perspectiveCamera = camera as THREE.PerspectiveCamera;
+    const z = 12; // profondeur cible (doit matcher newZ plus bas)
+    const fov = perspectiveCamera.fov * (Math.PI / 180);
+    const aspect = window.innerWidth / window.innerHeight;
+    const visibleHeight =
+      2 * Math.tan(fov / 2) * (z - perspectiveCamera.position.z);
+    const visibleWidth = visibleHeight * aspect;
+    const margin = 1.2; // marge pour ne pas coller au bord
+    const minX = -visibleWidth / 2 + margin;
+    const maxX = visibleWidth / 2 - margin;
+
     do {
-      const newX = (Math.random() - 0.5) * 8; // -4 à +4 (plus large)
+      const newX = Math.random() * (maxX - minX) + minX;
       const newY = 2.0 + Math.random() * 2; // 2.0 à 4.0 (hauteur raisonnable)
       const newZ = 12 + Math.random() * 6; // 12 à 18 (beaucoup plus loin)
       newPosition = [newX, newY, newZ];
@@ -289,13 +289,9 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
           restitution={0.3}
           mass={target.isActive ? undefined : 0.05}
           ccd={true}
-          onCollisionEnter={(e) => {
+          onCollisionEnter={() => {
             if (target.isActive) {
-              console.log("Collision détectée avec cible", target.id, e);
-              // Pour l'instant, on utilise la position de la cible comme point d'impact
-              // On pourrait améliorer cela avec des raycasts plus précis
-              const hitPoint: [number, number, number] = target.position;
-              handleTargetHit(target.id, hitPoint);
+              handleTargetHit(target.id);
             }
           }}
         >
@@ -323,6 +319,16 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
         </RigidBody>
       ))}
       {/* Cube orange de main (pour viser) */}
+      {/* Hitbox invisible plus grande sur mobile */}
+      <mesh
+        position={INITIAL_CUBE_POS}
+        onPointerDown={handlePointerDown}
+        visible={false}
+        scale={[2, 2, 2]}
+      >
+        <boxGeometry args={[0.4, 0.4, 0.4]} />
+        <meshBasicMaterial transparent opacity={0} />
+      </mesh>
       <mesh
         ref={cubeRef}
         position={INITIAL_CUBE_POS}
@@ -531,37 +537,40 @@ const CubeGame = () => {
   }, []);
 
   return (
-    <div className="w-full min-h-screen relative">
+    <div
+      className="w-full min-h-screen relative touch-none"
+      style={{ touchAction: "none" }}
+    >
       {/* Bouton de retour */}
       <button
         onClick={() => (window.location.href = "/")}
-        className="absolute top-6 left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-6 py-3 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-        aria-label="Back to home"
+        className="absolute top-4 left-2 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+        aria-label="Retour à l'accueil"
       >
         ← Back
       </button>
 
       {/* Écran d'accueil avec instructions */}
       {!gameStarted && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-16 py-10 rounded-xl shadow-2xl backdrop-blur-sm min-w-[400px] max-w-2xl mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2">
+          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-16 sm:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-xs sm:max-w-2xl mx-2 overflow-y-auto">
             {/* Effet holographique de fond */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
             <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
             <div className="relative z-10">
-              <div className="text-left space-y-4 mb-10">
-                <h2 className="text-2xl font-bold text-white mb-3">
+              <div className="text-left space-y-4 mb-8 sm:mb-10">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
                   How to play:
                 </h2>
-                <div className="space-y-3 text-lg font-semibold">
+                <div className="space-y-2 sm:space-y-3 text-base sm:text-lg font-semibold">
                   <p>
-                    • <span className="text-white">Click and hold</span> on the
+                    • <span className="text-white">Tap and hold</span> on the
                     orange cube to aim
                   </p>
                   <p>
-                    • <span className="text-white">Move the mouse</span> to
+                    • <span className="text-white">Move your finger</span> to
                     adjust angle and power
                   </p>
                   <p>
@@ -578,16 +587,18 @@ const CubeGame = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <button
                   onClick={handleStartGame}
-                  className="bg-orange-500 text-white px-6 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg"
+                  className="bg-orange-500 text-white w-full sm:w-auto px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base sm:text-lg"
+                  aria-label="Démarrer le jeu"
                 >
                   Start
                 </button>
                 <button
                   onClick={() => (window.location.href = "/")}
-                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-6 py-3 rounded-full font-bold shadow-lg"
+                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full sm:w-auto px-4 py-3 rounded-full font-bold shadow-lg text-base sm:text-lg"
+                  aria-label="Retour à l'accueil"
                 >
                   ← Back
                 </button>
@@ -600,7 +611,7 @@ const CubeGame = () => {
       {/* Décompte */}
       {gameStarted && countdown > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-          <div className="text-[20rem] font-black text-orange-400 animate-pulse select-none">
+          <div className="text-[7rem] sm:text-[20rem] font-black text-orange-400 animate-pulse select-none">
             {countdown}
           </div>
         </div>
@@ -610,8 +621,8 @@ const CubeGame = () => {
       {gameStarted && gameActive && (
         <button
           onClick={handleReset}
-          className="absolute top-6 right-6 z-50 bg-orange-500 text-white px-6 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-          aria-label="Reset game"
+          className="absolute top-4 right-2 z-50 bg-orange-500 text-white px-4 py-2 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+          aria-label="Réinitialiser le jeu"
         >
           Reset
         </button>
@@ -619,79 +630,121 @@ const CubeGame = () => {
 
       {/* Scoreboard: always visible during game, animates position/zoom, content changes */}
       {gameStarted && (
-        <div
-          className={`absolute z-50 transition-all duration-1000 ${
-            showFinalScore
-              ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-150"
-              : "top-6 left-1/2 transform -translate-x-1/2 scale-100"
-          }`}
-        >
-          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-16 py-6 rounded-xl shadow-2xl backdrop-blur-sm min-w-[400px]">
-            {/* Effet holographique de fond */}
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.2),transparent_50%)] rounded-xl"></div>
-            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
-
-            <div className="relative flex gap-20 items-center justify-center">
-              {!showFinalScore ? (
-                <>
-                  <div className="text-center">
-                    <div
-                      className="text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                      style={{ fontFamily: "Shutteblock, monospace" }}
-                    >
-                      {timeLeft}s
-                    </div>
-                    <div className="text-sm font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                      TIME
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div
-                      className="text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                      style={{ fontFamily: "Shutteblock, monospace" }}
-                    >
-                      {score}
-                    </div>
-                    <div className="text-sm font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                      TARGETS
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center">
+        <>
+          {/* Version mobile : deux blocs séparés uniquement si !showFinalScore */}
+          {!showFinalScore && (
+            <div className="block sm:hidden">
+              <div className="absolute top-16 left-4 z-50">
+                <div className="bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 rounded-xl shadow-2xl backdrop-blur-sm w-auto text-center">
                   <div
-                    className="text-3xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
+                    className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
                     style={{ fontFamily: "Shutteblock, monospace" }}
                   >
-                    Good job!
+                    {timeLeft}s
                   </div>
-                  <div
-                    className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                    style={{ fontFamily: "Shutteblock, monospace" }}
-                  >
-                    {score} targets in 30s
-                  </div>
-                  <div className="flex gap-4 justify-center mt-4">
-                    <button
-                      onClick={handleReset}
-                      className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm"
-                    >
-                      Play Again
-                    </button>
-                    <button
-                      onClick={() => (window.location.href = "/")}
-                      className="bg-[#18181b] border border-orange-500 text-orange-400 px-4 py-2 rounded-lg font-bold hover:bg-orange-500 hover:text-white transition-colors text-sm"
-                    >
-                      Back
-                    </button>
+                  <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                    TIME
                   </div>
                 </div>
-              )}
+              </div>
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+                <div className="bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 rounded-xl shadow-2xl backdrop-blur-sm w-auto text-center">
+                  <div
+                    className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                    style={{ fontFamily: "Shutteblock, monospace" }}
+                  >
+                    {score}
+                  </div>
+                  <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                    TARGETS
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Version desktop ou bloc final : bloc groupé centré */}
+          <div
+            className={`z-50 transition-all duration-1000 w-full px-4 sm:px-8 ${
+              showFinalScore ? "" : "hidden sm:block"
+            } ${
+              showFinalScore
+                ? "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-110"
+                : "absolute top-6 left-1/2 transform -translate-x-1/2 scale-100"
+            }`}
+          >
+            <div
+              className={`relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 sm:px-8 sm:py-6 rounded-xl shadow-2xl backdrop-blur-sm mx-auto ${
+                showFinalScore ? "max-w-xs sm:max-w-lg" : "w-auto"
+              }`}
+            >
+              {/* Effet holographique de fond */}
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.2),transparent_50%)] rounded-xl"></div>
+              <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
+
+              <div className="relative flex flex-col gap-2 items-center justify-center">
+                {!showFinalScore ? (
+                  <>
+                    <div className="text-center">
+                      <div
+                        className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                        style={{ fontFamily: "Shutteblock, monospace" }}
+                      >
+                        {timeLeft}s
+                      </div>
+                      <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                        TIME
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div
+                        className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                        style={{ fontFamily: "Shutteblock, monospace" }}
+                      >
+                        {score}
+                      </div>
+                      <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                        TARGETS
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <div
+                      className="text-xl sm:text-3xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
+                      style={{ fontFamily: "Shutteblock, monospace" }}
+                    >
+                      Good job!
+                    </div>
+                    <div
+                      className="text-lg sm:text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                      style={{ fontFamily: "Shutteblock, monospace" }}
+                    >
+                      {score} targets in 30s
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-4">
+                      <button
+                        onClick={handleReset}
+                        className="bg-orange-500 text-white w-full sm:w-auto px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm sm:text-base"
+                        aria-label="Rejouer"
+                      >
+                        Play Again
+                      </button>
+                      <button
+                        onClick={() => (window.location.href = "/")}
+                        className="bg-[#18181b] border border-orange-500 text-orange-400 w-full sm:w-auto px-4 py-2 rounded-lg font-bold hover:bg-orange-500 hover:text-white transition-colors text-sm sm:text-base"
+                        aria-label="Retour à l'accueil"
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {showPrompt && (
@@ -713,6 +766,7 @@ const CubeGame = () => {
           pointerEvents: gameStarted && gameActive ? "auto" : "none",
           background: "transparent",
           zIndex: 10,
+          touchAction: "none",
         }}
       >
         <Scene

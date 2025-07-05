@@ -380,7 +380,11 @@ const AnimatedCubes = ({
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(pointer, state.camera);
 
-        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+        const plane = new THREE.Plane();
+        plane.setFromNormalAndCoplanarPoint(
+          new THREE.Vector3().set(0, 0, 1),
+          new THREE.Vector3().set(0, 0, 0)
+        );
         const intersectionPoint = new THREE.Vector3();
         raycaster.ray.intersectPlane(plane, intersectionPoint);
 
@@ -400,7 +404,7 @@ const AnimatedCubes = ({
         setLastPointerPositions((prev) => {
           const newPositions = [
             ...prev,
-            new THREE.Vector2(pointer.x, pointer.y),
+            new THREE.Vector2().set(pointer.x, pointer.y),
           ];
 
           // Sur mobile, on garde moins d'échantillons pour une réponse plus rapide
