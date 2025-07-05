@@ -14,7 +14,7 @@ import {
   faBriefcase,
 } from "@fortawesome/free-solid-svg-icons";
 import { faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
-import emailjs from "emailjs-com";
+import emailjs from "@emailjs/browser";
 
 interface Section {
   id: string;
