@@ -15,6 +15,20 @@ const ProjectCard: React.FC<{
 }> = ({ project, onSizeChange, onProjectClick }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [viewportWidth, setViewportWidth] = React.useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+
+  // Détecter si on est sur mobile
+  const isMobile = viewportWidth < 640;
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Handler pour la fin de la transition de taille
   const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
@@ -41,7 +55,9 @@ const ProjectCard: React.FC<{
 
   return (
     <div
-      className="relative rounded-lg bg-neutral-900/50 backdrop-blur-md transition-all duration-700 ease-out group cursor-pointer hover:scale-105"
+      className={`relative rounded-lg bg-neutral-900/50 backdrop-blur-md transition-all duration-700 ease-out group cursor-pointer ${
+        !isMobile ? "hover:scale-105" : ""
+      }`}
       style={{
         width: isHovered ? "min(95vw, 500px)" : "clamp(140px, 25vw, 300px)",
         height: isHovered ? "min(95vw, 500px)" : "clamp(140px, 25vw, 300px)",
@@ -51,8 +67,8 @@ const ProjectCard: React.FC<{
         `,
         backgroundSize: "20px 20px",
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
       onTransitionEnd={handleTransitionEnd}
       onClick={handleClick}
     >
