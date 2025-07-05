@@ -1040,7 +1040,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             </div>
             <div className="hero-title-line">
               <h2
-                className="text-2xl sm:text-4xl md:text-6xl lg:text-8xl text-gray-300 font-heading hero-title"
+                className="text-4xl sm:text-4xl md:text-6xl lg:text-8xl text-gray-300 font-heading hero-title"
                 data-splitting="words"
                 style={{ opacity: 0, fontFamily: "shuttleblock, sans-serif" }}
               >
@@ -1120,277 +1120,471 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
       title: "Contact",
       content: (
         <>
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-heading">
-              Contact
+          {/* Version mobile */}
+          <div className="block lg:hidden w-full max-w-2xl mx-auto px-4">
+            {/* Titre */}
+            <div className="text-center mb-6">
+              <div className="text-2xl font-bold text-white mb-2 font-heading">
+                Contact
+              </div>
+              <div
+                className="w-16 h-1 mx-auto"
+                style={{ backgroundColor: "var(--color-grid)" }}
+              ></div>
             </div>
-            <div
-              className="w-24 h-1 mx-auto"
-              style={{ backgroundColor: "var(--color-grid)" }}
-            ></div>
+            {/* Texte d'intro */}
+            <div className="text-base text-gray-300 leading-relaxed font-body text-center mb-6">
+              Ready to bring your ideas to life? I'm always excited to work on
+              new projects and collaborate with creative minds.
+            </div>
+            {/* Formulaire de contact */}
+            <div className="mb-8">
+              <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="group">
+                    <label className="block text-white font-medium mb-2 font-body">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={form.name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
+                      placeholder="Your name"
+                      required
+                    />
+                  </div>
+                  <div className="group">
+                    <label className="block text-white font-medium mb-2 font-body">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleInputChange}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
+                      placeholder="your@email.com"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="group">
+                  <label className="block text-white font-medium mb-2 font-body">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={form.title}
+                    onChange={handleInputChange}
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
+                    placeholder="Subject of your message"
+                    required
+                  />
+                </div>
+                <div className="group">
+                  <label className="block text-white font-medium mb-2 font-body">
+                    Message
+                  </label>
+                  <textarea
+                    name="message"
+                    value={form.message}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-sm sm:text-base"
+                    placeholder="Your message..."
+                    required
+                  ></textarea>
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold text-sm sm:text-base border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
+                    style={{
+                      backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                      borderColor: "var(--color-grid)",
+                      color: "var(--color-grid)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(var(--color-grid-rgb), 0.2)";
+                      e.currentTarget.style.transform = "scale(1.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(var(--color-grid-rgb), 0.1)";
+                      e.currentTarget.style.transform = "scale(1)";
+                    }}
+                  >
+                    {loading ? "Sending..." : "Send Message"}
+                  </button>
+                  {feedback && (
+                    <div
+                      className={`text-center mt-4 ${
+                        feedback.type === "success"
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {feedback.message}
+                    </div>
+                  )}
+                </div>
+              </form>
+            </div>
+            {/* Connect With Me */}
+            <div className="pt-2 pb-4">
+              <h4 className="text-base font-semibold text-white mb-2 font-heading text-center">
+                Connect With Me
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {/* LinkedIn */}
+                <a
+                  href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-center p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 min-w-0 w-full"
+                  aria-label="LinkedIn"
+                >
+                  <div
+                    className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                    style={{
+                      backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faLinkedinIn}
+                      className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </a>
+                {/* Email */}
+                <a
+                  href="mailto:jeremynaphay@gmail.com"
+                  className="group flex items-center justify-center p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 min-w-0 w-full"
+                  aria-label="Email"
+                >
+                  <div
+                    className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                    style={{
+                      backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faEnvelope}
+                      className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </a>
+              </div>
+            </div>
+            {/* Grille Location & Available for côte à côte - repositionnée en bas */}
+            <div className="grid grid-cols-2 gap-3 mt-8">
+              {/* Location */}
+              <div className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
+                <div
+                  className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                  style={{
+                    backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="text-left">
+                  <p className="text-gray-400 text-xs font-body text-left">
+                    Lyon, France
+                  </p>
+                </div>
+              </div>
+              {/* Available for */}
+              <div className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
+                <div
+                  className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                  style={{
+                    backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faBriefcase}
+                    className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="flex items-center space-x-2 ml-auto">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                  <span className="text-green-400 text-xs font-medium">
+                    Available
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-16 lg:gap-32 items-start">
-              {/* Section de gauche - Informations de contact */}
-              <div className="space-y-6 sm:space-y-8">
-                <div className="space-y-4 sm:space-y-6">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 font-heading">
-                    Let's create something
-                    <span
-                      className="block"
-                      style={{ color: "var(--color-grid)" }}
-                    >
-                      amazing together
-                    </span>
-                  </h3>
-
-                  <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
-                    Ready to bring your ideas to life? I'm always excited to
-                    work on new projects and collaborate with creative minds.
-                  </p>
-
-                  <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8">
-                    {/* Email */}
-                    <div className="group">
+          {/* Version desktop (restaurée) */}
+          <div className="hidden lg:block">
+            <div className="text-center mb-12">
+              <div className="text-4xl md:text-5xl font-bold text-white mb-4 font-heading">
+                Contact
+              </div>
+              <div
+                className="w-24 h-1 mx-auto"
+                style={{ backgroundColor: "var(--color-grid)" }}
+              ></div>
+            </div>
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-8 gap-x-0 lg:gap-x-32 items-start">
+                {/* Colonne gauche : texte + infos + social */}
+                <div className="space-y-8">
+                  <div className="space-y-6">
+                    <h3 className="text-3xl font-bold text-white mb-8 font-heading">
+                      Let's create something
+                      <span
+                        className="block"
+                        style={{ color: "var(--color-grid)" }}
+                      >
+                        amazing together
+                      </span>
+                    </h3>
+                    <p className="text-lg text-gray-300 leading-relaxed font-body">
+                      Ready to bring your ideas to life? I'm always excited to
+                      work on new projects and collaborate with creative minds.
+                    </p>
+                  </div>
+                  {/* Social Links */}
+                  <div className="pt-8">
+                    <h4 className="text-lg font-semibold text-white mb-4 font-heading text-left">
+                      Connect With Me
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      {/* LinkedIn */}
                       <a
-                        href="mailto:jeremynaphay@gmail.com"
-                        className="flex items-center space-x-3 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-orange-500/20"
+                        href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105"
                       >
                         <div
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                          className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                          style={{
+                            backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faLinkedinIn}
+                            className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                            aria-hidden="true"
+                          />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-white font-medium text-sm font-body text-left">
+                            LinkedIn
+                          </p>
+                          <p className="text-gray-400 text-xs font-body text-left">
+                            @jeremynaphay
+                          </p>
+                        </div>
+                      </a>
+                      {/* Email */}
+                      <a
+                        href="mailto:jeremynaphay@gmail.com"
+                        className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105"
+                      >
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                           style={{
                             backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                           }}
                         >
                           <FontAwesomeIcon
                             icon={faEnvelope}
-                            className="text-lg sm:text-xl text-white group-hover:text-orange-400 transition-colors"
+                            className="text-lg text-white group-hover:text-orange-400 transition-colors"
                             aria-hidden="true"
                           />
                         </div>
-                        <div className="flex-1">
-                          <p className="text-white font-semibold text-sm sm:text-base font-body">
+                        <div className="text-left">
+                          <p className="text-white font-medium text-sm font-body text-left">
                             Email
                           </p>
-                          <p className="text-gray-400 text-xs sm:text-sm font-body group-hover:text-orange-400 transition-colors duration-300">
+                          <p className="text-gray-400 text-xs font-body text-left">
                             jeremynaphay@gmail.com
                           </p>
                         </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2">
-                          <span className="text-orange-400 text-lg">→</span>
-                        </div>
                       </a>
                     </div>
-
-                    {/* Location */}
-                    <div className="group">
-                      <div className="flex items-center space-x-3 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50">
-                        <div
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                          style={{
-                            backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faLocationDot}
-                            className="text-lg sm:text-xl text-white group-hover:text-orange-400 transition-colors"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-white font-semibold text-sm sm:text-base font-body">
-                            Location
-                          </p>
-                          <p className="text-gray-400 text-xs sm:text-sm font-body">
-                            Lyon, France
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Availability */}
-                    <div className="group">
-                      <div className="flex items-center space-x-3 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50">
-                        <div
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                          style={{
-                            backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faBriefcase}
-                            className="text-lg sm:text-xl text-white group-hover:text-orange-400 transition-colors"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-white font-semibold text-sm sm:text-base font-body">
-                            Available for
-                          </p>
-                          <p className="text-gray-400 text-xs sm:text-sm font-body">
-                            Freelance & Full-time
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                          <span className="text-green-400 text-xs font-medium">
-                            Available
-                          </span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
-                </div>
-
-                {/* Social Links */}
-                <div className="pt-6 sm:pt-8">
-                  <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 font-heading">
-                    Connect With Me
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <a
-                      href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center space-x-3 p-2 sm:p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105"
-                    >
+                  {/* Location & Available for */}
+                  <div className="space-y-6 pt-8">
+                    {/* Location */}
+                    <div className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-fit">
                       <div
-                        className="w-6 h-6 sm:w-8 sm:h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                        className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                         style={{
                           backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                         }}
                       >
                         <FontAwesomeIcon
-                          icon={faLinkedinIn}
-                          className="text-sm sm:text-lg text-white group-hover:text-orange-400 transition-colors"
+                          icon={faLocationDot}
+                          className="text-lg text-white group-hover:text-orange-400 transition-colors"
                           aria-hidden="true"
                         />
                       </div>
-                      <div>
-                        <p className="text-white font-medium text-xs sm:text-sm font-body">
-                          LinkedIn
+                      <div className="text-left">
+                        <p className="text-white font-medium text-sm font-body text-left">
+                          Location
                         </p>
-                        <p className="text-gray-400 text-xs font-body">
-                          @jeremynaphay
+                        <p className="text-gray-400 text-xs font-body text-left">
+                          Lyon, France
                         </p>
                       </div>
-                    </a>
+                    </div>
+                    {/* Available for */}
+                    <div className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-fit">
+                      <div
+                        className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                        style={{
+                          backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faBriefcase}
+                          className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white font-medium text-sm font-body text-left">
+                          Available for
+                        </p>
+                        <p className="text-gray-400 text-xs font-body text-left">
+                          Freelance & Full-time
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2 ml-auto">
+                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                        <span className="text-green-400 text-xs font-medium">
+                          Available
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Section de droite - Formulaire de contact */}
-              <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-                <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 md:mb-8 font-heading">
-                    Send me a
-                    <span
-                      className="block"
-                      style={{ color: "var(--color-grid)" }}
-                    >
-                      message
-                    </span>
-                  </h3>
-
-                  <form
-                    className="space-y-4 sm:space-y-6"
-                    onSubmit={handleSubmit}
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Colonne droite : formulaire */}
+                <div className="space-y-8">
+                  <div className="space-y-6">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 font-heading">
+                      Send me a
+                      <span
+                        className="block"
+                        style={{ color: "var(--color-grid)" }}
+                      >
+                        message
+                      </span>
+                    </h3>
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="group">
+                          <label className="block text-white font-medium mb-2 font-body">
+                            Name
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={form.name}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body"
+                            placeholder="Your name"
+                            required
+                          />
+                        </div>
+                        <div className="group">
+                          <label className="block text-white font-medium mb-2 font-body">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body"
+                            placeholder="your@email.com"
+                            required
+                          />
+                        </div>
+                      </div>
                       <div className="group">
                         <label className="block text-white font-medium mb-2 font-body">
-                          Name
+                          Subject
                         </label>
                         <input
                           type="text"
-                          name="name"
-                          value={form.name}
+                          name="title"
+                          value={form.title}
                           onChange={handleInputChange}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
-                          placeholder="Your name"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body"
+                          placeholder="Subject of your message"
                           required
                         />
                       </div>
                       <div className="group">
                         <label className="block text-white font-medium mb-2 font-body">
-                          Email
+                          Message
                         </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={form.email}
+                        <textarea
+                          name="message"
+                          value={form.message}
                           onChange={handleInputChange}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
-                          placeholder="your@email.com"
+                          rows={5}
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body"
+                          placeholder="Your message..."
                           required
-                        />
+                        ></textarea>
                       </div>
-                    </div>
-                    <div className="group">
-                      <label className="block text-white font-medium mb-2 font-body">
-                        Subject
-                      </label>
-                      <input
-                        type="text"
-                        name="title"
-                        value={form.title}
-                        onChange={handleInputChange}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
-                        placeholder="Subject of your message"
-                        required
-                      />
-                    </div>
-                    <div className="group">
-                      <label className="block text-white font-medium mb-2 font-body">
-                        Message
-                      </label>
-                      <textarea
-                        name="message"
-                        value={form.message}
-                        onChange={handleInputChange}
-                        rows={4}
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-sm sm:text-base"
-                        placeholder="Your message..."
-                        required
-                      ></textarea>
-                    </div>
-                    <div>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold text-sm sm:text-base border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
-                        style={{
-                          backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
-                          borderColor: "var(--color-grid)",
-                          color: "var(--color-grid)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "rgba(var(--color-grid-rgb), 0.2)";
-                          e.currentTarget.style.transform = "scale(1.05)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            "rgba(var(--color-grid-rgb), 0.1)";
-                          e.currentTarget.style.transform = "scale(1)";
-                        }}
-                      >
-                        {loading ? "Sending..." : "Send Message"}
-                      </button>
-                      {feedback && (
-                        <div
-                          className={`text-center mt-4 ${
-                            feedback.type === "success"
-                              ? "text-green-400"
-                              : "text-red-400"
-                          }`}
+                      <div>
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full px-6 py-3 rounded-lg font-bold text-base border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
+                          style={{
+                            backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                            borderColor: "var(--color-grid)",
+                            color: "var(--color-grid)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              "rgba(var(--color-grid-rgb), 0.2)";
+                            e.currentTarget.style.transform = "scale(1.05)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              "rgba(var(--color-grid-rgb), 0.1)";
+                            e.currentTarget.style.transform = "scale(1)";
+                          }}
                         >
-                          {feedback.message}
-                        </div>
-                      )}
-                    </div>
-                  </form>
+                          {loading ? "Sending..." : "Send Message"}
+                        </button>
+                        {feedback && (
+                          <div
+                            className={`text-center mt-4 ${
+                              feedback.type === "success"
+                                ? "text-green-400"
+                                : "text-red-400"
+                            }`}
+                          >
+                            {feedback.message}
+                          </div>
+                        )}
+                      </div>
+                    </form>
+                  </div>
                 </div>
               </div>
             </div>
