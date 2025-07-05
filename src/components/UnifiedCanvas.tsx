@@ -92,8 +92,12 @@ const SectionContent: React.FC<{
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            paddingTop: isMobile ? "60px" : "48px", // Compensation pour centrer parfaitement
-            paddingBottom: isMobile ? "60px" : "48px", // Compensation pour centrer parfaitement
+            paddingTop: isMobile ? "80px" : "48px", // Position plus haute sur mobile
+            paddingBottom: isMobile
+              ? section.id === "about" || section.id === "contact"
+                ? "80px"
+                : "40px"
+              : "48px", // Plus de padding bottom pour about et contact sur mobile
           }}
         >
           <div
@@ -106,7 +110,7 @@ const SectionContent: React.FC<{
               pointerEvents: isDragging ? "none" : "auto",
               minHeight: "fit-content",
               maxHeight: availableHeight,
-              overflowY: "auto",
+              overflowY: "hidden",
               margin: "0 auto",
             }}
           >
