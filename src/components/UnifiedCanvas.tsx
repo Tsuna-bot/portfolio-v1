@@ -323,12 +323,12 @@ const NavigationDots: React.FC<{
   return (
     <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-50 mt-6">
       <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 sm:px-5 py-2 sm:py-3 border border-white/10 transition-transform duration-300 hover:scale-150">
-        <div className="flex space-x-2 sm:space-x-4">
+        <div className="flex space-x-4 sm:space-x-4">
           {sections.map((section, index) => (
             <button
               key={index}
               onClick={() => onSectionChange(index)}
-              className="relative w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full transition-transform duration-300 hover:scale-110 group"
+              className="relative w-3 sm:w-3 h-3 sm:h-3 rounded-full transition-transform duration-300 hover:scale-110 group"
               aria-label={`Aller à la section ${index + 1}`}
             >
               {/* Cercle pulsant pour le dot actif */}
@@ -973,7 +973,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             interaction, I specialize in building dynamic websites that feel
             like living worlds.
           </p>
-          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center mt-6 sm:mt-4">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
             <button
               className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
               style={{
