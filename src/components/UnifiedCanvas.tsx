@@ -53,13 +53,21 @@ const SectionContent: React.FC<{
   const [viewportHeight, setViewportHeight] = useState(
     typeof window !== "undefined" ? window.innerHeight : 800
   );
-  // Hauteur de la navdot (à ajuster si besoin)
-  const navDotHeight = 96;
-  const margin = 24; // marge de sécurité
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+
+  // Calcul responsive de l'espace disponible
+  const isMobile = viewportWidth < 640;
+  const navDotHeight = isMobile ? 120 : 96; // Plus d'espace sur mobile
+  const margin = isMobile ? 32 : 24; // Marge plus importante sur mobile
   const availableHeight = viewportHeight - navDotHeight - margin;
 
   useEffect(() => {
-    const handleResize = () => setViewportHeight(window.innerHeight);
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+      setViewportWidth(window.innerWidth);
+    };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -77,7 +85,11 @@ const SectionContent: React.FC<{
       <div className="w-screen h-screen flex items-center justify-center">
         <div
           className="container mx-auto px-4 text-center py-8"
-          style={{ height: "100%", maxHeight: viewportHeight }}
+          style={{
+            height: "100%",
+            maxHeight: availableHeight,
+            paddingBottom: isMobile ? "120px" : "96px", // Espace pour les navdots
+          }}
         >
           <div
             className={
@@ -87,10 +99,11 @@ const SectionContent: React.FC<{
             }
             style={{
               pointerEvents: isDragging ? "none" : "auto",
-              minHeight: availableHeight,
+              minHeight: "fit-content",
               maxHeight: availableHeight,
               overflowY: "auto",
               margin: "0 auto",
+              paddingBottom: isMobile ? "20px" : "0px", // Espace supplémentaire en bas sur mobile
             }}
           >
             {section.content}
@@ -303,14 +316,14 @@ const NavigationDots: React.FC<{
   onSectionChange: (sectionIndex: number) => void;
 }> = ({ sections, currentSection, onSectionChange }) => {
   return (
-    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 mt-6">
-      <div className="bg-black/20 backdrop-blur-sm rounded-full px-5 py-3 border border-white/10 transition-transform duration-300 hover:scale-150">
-        <div className="flex space-x-4">
+    <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-50 mt-6">
+      <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 sm:px-5 py-2 sm:py-3 border border-white/10 transition-transform duration-300 hover:scale-150">
+        <div className="flex space-x-2 sm:space-x-4">
           {sections.map((section, index) => (
             <button
               key={index}
               onClick={() => onSectionChange(index)}
-              className="relative w-3 h-3 rounded-full transition-transform duration-300 hover:scale-110 group"
+              className="relative w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full transition-transform duration-300 hover:scale-110 group"
               aria-label={`Aller à la section ${index + 1}`}
             >
               {/* Cercle pulsant pour le dot actif */}
