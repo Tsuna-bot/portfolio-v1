@@ -1261,7 +1261,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <h4 className="text-sm font-semibold text-white mb-1 font-heading text-center">
                 Connect With Me
               </h4>
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-2 gap-2 pb-8 lg:pb-0">
                 {/* LinkedIn */}
                 <a
                   href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
