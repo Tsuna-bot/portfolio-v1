@@ -4,6 +4,7 @@ import type { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 
 const CUBE_SIZE = 0.5;
+const MOBILE_CUBE_SIZE = 1.5;
 const VELOCITY_SAMPLES = 50;
 
 type CubeData = {
@@ -114,6 +115,7 @@ const Cube = ({
   onPointerOver,
   onPointerOut,
   specialFlicker,
+  cubeSize,
 }: {
   cubeData: CubeData;
   index: number;
@@ -121,6 +123,7 @@ const Cube = ({
   onPointerOver: () => void;
   onPointerOut: () => void;
   specialFlicker?: number;
+  cubeSize: number;
 }) => {
   return (
     <group position={cubeData.position} rotation={cubeData.rotation}>
@@ -132,7 +135,7 @@ const Cube = ({
         onPointerOver={onPointerOver}
         onPointerOut={onPointerOut}
       >
-        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
+        <boxGeometry args={[cubeSize, cubeSize, cubeSize]} />
         <meshStandardMaterial
           color={cubeData.color}
           transparent
@@ -169,6 +172,21 @@ const AnimatedCubes = ({
     Math.tan((perspectiveCamera.fov * Math.PI) / 360) *
     perspectiveCamera.position.z;
 
+  // Détecter si on est sur mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const currentCubeSize = isMobile ? MOBILE_CUBE_SIZE : CUBE_SIZE;
+
   const [cubes, setCubes] = useState<CubeData[]>(() => {
     const specialCube = createSpecialCube(sceneWidth, sceneHeight);
     const normalCubes = generateRandomCubes(sceneWidth, sceneHeight);
@@ -189,7 +207,7 @@ const AnimatedCubes = ({
 
   useEffect(() => {
     const handleGlobalMouseUp = () => {
-      if (draggedCubeId !== null) {
+      if (draggedCubeId !== null && !isMobile) {
         if (lastPointerPositions.length >= 2) {
           const lastPos = lastPointerPositions[lastPointerPositions.length - 1];
           const secondLastPos =
@@ -239,12 +257,66 @@ const AnimatedCubes = ({
       }
     };
 
+    const handleGlobalTouchEnd = () => {
+      if (draggedCubeId !== null && isMobile) {
+        if (lastPointerPositions.length >= 2) {
+          const lastPos = lastPointerPositions[lastPointerPositions.length - 1];
+          const secondLastPos =
+            lastPointerPositions[lastPointerPositions.length - 2];
+          if (lastPos && secondLastPos) {
+            const velocityX = (lastPos.x - secondLastPos.x) * 4.0; // Vitesse plus élevée pour mobile
+            const velocityY = (lastPos.y - secondLastPos.y) * 4.0;
+
+            const minVelocity = 0.005; // Seuil plus bas pour mobile
+            const velocityMagnitude = Math.sqrt(
+              velocityX * velocityX + velocityY * velocityY
+            );
+
+            setCubes((prev) =>
+              prev.map((cube, i) =>
+                i === draggedCubeId
+                  ? {
+                      ...cube,
+                      isDragged: false,
+                      direction:
+                        velocityMagnitude > minVelocity
+                          ? [velocityX, velocityY, 0]
+                          : cube.originalDirection,
+                    }
+                  : cube
+              )
+            );
+          }
+        } else {
+          setCubes((prev) =>
+            prev.map((cube, i) =>
+              i === draggedCubeId
+                ? {
+                    ...cube,
+                    isDragged: false,
+                    direction: cube.originalDirection,
+                  }
+                : cube
+            )
+          );
+        }
+
+        setDraggedCubeId(null);
+        setLastPointerPositions([]);
+        onDragStateChange(false);
+      }
+    };
+
     document.addEventListener("mouseup", handleGlobalMouseUp);
-    return () => document.removeEventListener("mouseup", handleGlobalMouseUp);
-  }, [draggedCubeId, lastPointerPositions, onDragStateChange]);
+    document.addEventListener("touchend", handleGlobalTouchEnd);
+    return () => {
+      document.removeEventListener("mouseup", handleGlobalMouseUp);
+      document.removeEventListener("touchend", handleGlobalTouchEnd);
+    };
+  }, [draggedCubeId, lastPointerPositions, onDragStateChange, isMobile]);
 
   const handlePointerDown = (
-    _event: ThreeEvent<PointerEvent>,
+    event: ThreeEvent<PointerEvent>,
     index: number
   ) => {
     const cube = cubes[index];
@@ -254,17 +326,27 @@ const AnimatedCubes = ({
       return;
     }
 
+    // Empêcher le comportement par défaut sur mobile pour éviter le zoom
+    if (isMobile) {
+      event.nativeEvent.preventDefault();
+    }
+
     setDraggedCubeId(index);
     setCubes((prev) =>
       prev.map((cube, i) => (i === index ? { ...cube, isDragged: true } : cube))
     );
     onDragStateChange(true);
-    document.body.style.cursor = "grabbing";
+
+    // Ne changer le curseur que sur desktop
+    if (!isMobile) {
+      document.body.style.cursor = "grabbing";
+    }
+
     setLastPointerPositions([]);
   };
 
   const handlePointerOver = (index: number) => {
-    if (draggedCubeId === null) {
+    if (draggedCubeId === null && !isMobile) {
       const cube = cubes[index];
       if (cube && cube.isSpecial) {
         document.body.style.cursor = "pointer";
@@ -275,7 +357,7 @@ const AnimatedCubes = ({
   };
 
   const handlePointerOut = () => {
-    if (draggedCubeId === null) {
+    if (draggedCubeId === null && !isMobile) {
       document.body.style.cursor = "default";
     }
   };
@@ -305,12 +387,16 @@ const AnimatedCubes = ({
           )
         );
 
+        // Gestion différente des positions selon mobile/desktop
         setLastPointerPositions((prev) => {
           const newPositions = [
             ...prev,
             new THREE.Vector2(pointer.x, pointer.y),
           ];
-          if (newPositions.length > VELOCITY_SAMPLES) {
+
+          // Sur mobile, on garde moins d'échantillons pour une réponse plus rapide
+          const maxSamples = isMobile ? VELOCITY_SAMPLES / 2 : VELOCITY_SAMPLES;
+          if (newPositions.length > maxSamples) {
             newPositions.shift();
           }
           return newPositions;
@@ -336,8 +422,8 @@ const AnimatedCubes = ({
         const fov = perspectiveCamera.fov * (Math.PI / 180);
         const aspectRatio = window.innerWidth / window.innerHeight;
         const viewportWidth = 2 * Math.tan(fov / 2) * cameraZ * aspectRatio;
-        const leftBound = cameraX - viewportWidth / 2 + CUBE_SIZE / 2;
-        const rightBound = cameraX + viewportWidth / 2 - CUBE_SIZE / 2;
+        const leftBound = cameraX - viewportWidth / 2 + currentCubeSize / 2;
+        const rightBound = cameraX + viewportWidth / 2 - currentCubeSize / 2;
 
         // Logique de rebond pour tous les cubes
         if (newPosition[0] > rightBound || newPosition[0] < leftBound) {
@@ -369,13 +455,13 @@ const AnimatedCubes = ({
         }
 
         if (
-          newPosition[1] > halfHeight - CUBE_SIZE / 2 ||
-          newPosition[1] < -halfHeight + CUBE_SIZE / 2
+          newPosition[1] > halfHeight - currentCubeSize / 2 ||
+          newPosition[1] < -halfHeight + currentCubeSize / 2
         ) {
           cube.direction[1] *= -1;
           newPosition[1] = Math.max(
-            -halfHeight + CUBE_SIZE / 2,
-            Math.min(halfHeight - CUBE_SIZE / 2, newPosition[1])
+            -halfHeight + currentCubeSize / 2,
+            Math.min(halfHeight - currentCubeSize / 2, newPosition[1])
           );
         }
 
@@ -399,7 +485,7 @@ const AnimatedCubes = ({
             const dz = currentPosition[2] - otherCube.position[2];
             const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-            const collisionThreshold = CUBE_SIZE * 1.2;
+            const collisionThreshold = currentCubeSize * 1.2;
             if (distance < collisionThreshold && distance > 0.001) {
               hasCollision = true;
 
@@ -429,7 +515,7 @@ const AnimatedCubes = ({
                 otherCube.direction[2] += dotProduct * nz * 0.95;
               }
 
-              const overlap = CUBE_SIZE - distance;
+              const overlap = currentCubeSize - distance;
               const separationForce = overlap * 2;
 
               currentPosition = [
@@ -487,6 +573,7 @@ const AnimatedCubes = ({
           onPointerOver={() => handlePointerOver(index)}
           onPointerOut={handlePointerOut}
           specialFlicker={cube.isSpecial ? flickerRef.current : undefined}
+          cubeSize={currentCubeSize}
         />
       ))}
       {/* Lumière qui suit le cube spécial et scintille */}
