@@ -878,8 +878,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
   // Déclaration du contenu About ici pour accès au handler
   const aboutSection = (
     <>
-      <div className="text-center mb-16">
-        <div className="text-4xl md:text-5xl font-bold text-white mb-4 font-heading">
+      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-heading">
           About
         </div>
         <div
@@ -887,23 +887,23 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           style={{ backgroundColor: "var(--color-grid)" }}
         ></div>
       </div>
-      <div className="max-w-4xl mx-auto text-center">
-        <div className="space-y-6">
-          <h3 className="text-2xl font-semibold text-white mb-4 font-heading">
+      <div className="max-w-4xl mx-auto text-center px-4">
+        <div className="space-y-4 sm:space-y-6">
+          <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4 font-heading">
             Passionate Creative Dev UI
           </h3>
-          <p className="text-lg text-gray-300 leading-relaxed font-body">
+          <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
             Hi ! I'm Jérémy, a french Creative Developer blending technology,
             design, and storytelling to craft bold, immersive web experiences.
           </p>
-          <p className="text-lg text-gray-300 leading-relaxed font-body">
+          <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
             With a strong foundation in UI/UX design and a sharp eye for
             interaction, I specialize in building dynamic websites that feel
             like living worlds.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">
             <button
-              className="px-8 py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-lg font-bold"
+              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -924,7 +924,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">UI/UX Design</span>
             </button>
             <button
-              className="px-8 py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-lg font-bold"
+              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -945,7 +945,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">Front-end</span>
             </button>
             <button
-              className="px-8 py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-lg font-bold"
+              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -966,7 +966,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">Adobe Suite</span>
             </button>
             <button
-              className="px-8 py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-lg font-bold"
+              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1002,7 +1002,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           <div className="hero-title-container">
             <div className="hero-title-line">
               <h1
-                className="text-2xl md:text-4xl font-bold text-white mb-6 font-body hero-title"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 sm:mb-6 font-body hero-title"
                 data-splitting="words"
                 style={{
                   color: "var(--color-grid)",
@@ -1015,7 +1015,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             </div>
             <div className="hero-title-line">
               <h2
-                className="text-4xl md:text-8xl text-gray-300 font-heading hero-title"
+                className="text-2xl sm:text-4xl md:text-6xl lg:text-8xl text-gray-300 font-heading hero-title"
                 data-splitting="words"
                 style={{ opacity: 0, fontFamily: "shuttleblock, sans-serif" }}
               >
@@ -1034,7 +1034,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             </div>
             <div className="hero-title-line">
               <h2
-                className="text-3xl md:text-4xl text-gray-300 my-2 font-heading hero-title"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-gray-300 my-2 font-heading hero-title"
                 data-splitting="words"
                 style={{ opacity: 0, fontFamily: "shuttleblock, sans-serif" }}
               >
@@ -1095,8 +1095,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
       title: "Contact",
       content: (
         <>
-          <div className="text-center mb-16">
-            <div className="text-4xl md:text-5xl font-bold text-white mb-4 font-heading">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-heading">
               Contact
             </div>
             <div
@@ -1105,12 +1105,12 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             ></div>
           </div>
 
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-32">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-16 lg:gap-32">
               {/* Section de gauche - Informations de contact */}
               <div className="space-y-8">
                 <div className="space-y-6">
-                  <h3 className="text-3xl font-bold text-white mb-8 font-heading">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 font-heading">
                     Let's create something
                     <span
                       className="block"
@@ -1120,7 +1120,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     </span>
                   </h3>
 
-                  <p className="text-lg text-gray-300 leading-relaxed font-body">
+                  <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
                     Ready to bring your ideas to life? I'm always excited to
                     work on new projects and collaborate with creative minds.
                   </p>
@@ -1220,10 +1220,10 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
 
                 {/* Social Links */}
                 <div className="pt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 font-heading">
+                  <h4 className="text-base sm:text-lg font-semibold text-white mb-4 font-heading">
                     Connect With Me
                   </h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <a
                       href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
                       target="_blank"
@@ -1258,7 +1258,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               {/* Section de droite - Formulaire de contact */}
               <div className="space-y-8">
                 <div className="space-y-6">
-                  <h3 className="text-3xl font-bold text-white mb-8 font-heading">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 font-heading">
                     Send me a
                     <span
                       className="block"
@@ -1269,7 +1269,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                   </h3>
 
                   <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="group">
                         <label className="block text-white font-medium mb-2 font-body">
                           Name

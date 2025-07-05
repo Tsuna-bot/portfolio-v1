@@ -43,8 +43,8 @@ const ProjectCard: React.FC<{
     <div
       className="relative rounded-lg bg-neutral-900/50 backdrop-blur-md transition-all duration-700 ease-out group cursor-pointer hover:scale-105"
       style={{
-        width: isHovered ? "min(90vw, 500px)" : "clamp(160px, 30vw, 300px)",
-        height: isHovered ? "min(90vw, 500px)" : "clamp(160px, 30vw, 300px)",
+        width: isHovered ? "min(95vw, 500px)" : "clamp(140px, 25vw, 300px)",
+        height: isHovered ? "min(95vw, 500px)" : "clamp(140px, 25vw, 300px)",
         backgroundImage: `
           linear-gradient(rgba(255, 122, 26, 0.05) 1px, transparent 1px),
           linear-gradient(90deg, rgba(255, 122, 26, 0.05) 1px, transparent 1px)
