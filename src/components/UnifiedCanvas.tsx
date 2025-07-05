@@ -84,11 +84,16 @@ const SectionContent: React.FC<{
     >
       <div className="w-screen h-screen flex items-center justify-center">
         <div
-          className="container mx-auto px-4 text-center py-8"
+          className="container mx-auto px-4 text-center"
           style={{
             height: "100%",
             maxHeight: availableHeight,
-            paddingBottom: isMobile ? "120px" : "96px", // Espace pour les navdots
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: isMobile ? "60px" : "48px", // Compensation pour centrer parfaitement
+            paddingBottom: isMobile ? "60px" : "48px", // Compensation pour centrer parfaitement
           }}
         >
           <div
@@ -103,7 +108,6 @@ const SectionContent: React.FC<{
               maxHeight: availableHeight,
               overflowY: "auto",
               margin: "0 auto",
-              paddingBottom: isMobile ? "20px" : "0px", // Espace supplémentaire en bas sur mobile
             }}
           >
             {section.content}
@@ -968,7 +972,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             interaction, I specialize in building dynamic websites that feel
             like living worlds.
           </p>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
             <button
               className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
               style={{
@@ -1163,7 +1167,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
       content: (
         <>
           {/* Version mobile */}
-          <div className="block lg:hidden w-full max-w-2xl mx-auto px-2 -mt-8">
+          <div className="block lg:hidden w-full max-w-2xl mx-auto px-2">
             {/* Titre */}
             <div className="text-center mb-2">
               <div className="text-xl font-bold text-white mb-1 font-heading">
@@ -1173,6 +1177,10 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                 className="w-12 h-0.5 mx-auto"
                 style={{ backgroundColor: "var(--color-grid)" }}
               ></div>
+            </div>
+            {/* Texte d'intro */}
+            <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-2">
+              Ready to bring your ideas to life ?
             </div>
             {/* Formulaire de contact */}
             <div className="mb-3">
@@ -1321,7 +1329,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </div>
             </div>
             {/* Grille Location & Available for côte à côte - repositionnée en bas */}
-            <div className="grid grid-cols-2 gap-2 -mb-4">
+            <div className="grid grid-cols-2 gap-2 mb-4">
               {/* Location */}
               <div className="group flex items-center justify-center space-x-2 p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
                 <div
