@@ -687,17 +687,17 @@ const CubeGame = () => {
           )}
           {/* Version desktop ou bloc final : bloc groupé centré */}
           <div
-            className={`z-50 transition-all duration-1000 w-full px-4 sm:px-8 ${
+            className={`z-50 transition-all duration-1000 px-2 ${
               showFinalScore ? "" : "hidden sm:block"
             } ${
               showFinalScore
                 ? "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-110"
-                : "absolute top-6 left-1/2 transform -translate-x-1/2 scale-100"
+                : "absolute top-4 left-1/2 transform -translate-x-1/2 scale-100"
             }`}
           >
             <div
-              className={`relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 sm:px-8 sm:py-6 rounded-xl shadow-2xl backdrop-blur-sm mx-auto ${
-                showFinalScore ? "max-w-xs sm:max-w-lg" : "w-auto"
+              className={`relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-8 py-6 rounded-xl shadow-2xl backdrop-blur-sm mx-auto ${
+                showFinalScore ? "w-80" : "w-80"
               }`}
             >
               {/* Effet holographique de fond */}
@@ -709,26 +709,28 @@ const CubeGame = () => {
               <div className="relative flex flex-col gap-2 items-center justify-center">
                 {!showFinalScore ? (
                   <>
-                    <div className="text-center">
-                      <div
-                        className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                        style={{ fontFamily: "Shutteblock, monospace" }}
-                      >
-                        {timeLeft}s
+                    <div className="flex gap-16 items-center">
+                      <div className="text-center">
+                        <div
+                          className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                          style={{ fontFamily: "Shutteblock, monospace" }}
+                        >
+                          {timeLeft}s
+                        </div>
+                        <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                          TIME
+                        </div>
                       </div>
-                      <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                        TIME
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div
-                        className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                        style={{ fontFamily: "Shutteblock, monospace" }}
-                      >
-                        {score}
-                      </div>
-                      <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                        TARGETS
+                      <div className="text-center">
+                        <div
+                          className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                          style={{ fontFamily: "Shutteblock, monospace" }}
+                        >
+                          {score}
+                        </div>
+                        <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                          TARGETS
+                        </div>
                       </div>
                     </div>
                   </>
