@@ -1257,7 +1257,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </form>
             </div>
             {/* Connect With Me */}
-            <div className="pt-1 pb-2"></div>
+            <div className="pt-1 pb-2">
               <h4 className="text-sm font-semibold text-white mb-1 font-heading text-center">
                 Connect With Me
               </h4>
