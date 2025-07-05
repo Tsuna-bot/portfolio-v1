@@ -1148,30 +1148,30 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     work on new projects and collaborate with creative minds.
                   </p>
 
-                  <div className="space-y-6 pt-8">
+                  <div className="space-y-4 sm:space-y-6 pt-6 sm:pt-8">
                     {/* Email */}
                     <div className="group">
                       <a
                         href="mailto:jeremynaphay@gmail.com"
-                        className="flex items-center space-x-3 p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-orange-500/20"
+                        className="flex items-center space-x-3 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-orange-500/20"
                       >
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                           style={{
                             backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                           }}
                         >
                           <FontAwesomeIcon
                             icon={faEnvelope}
-                            className="text-xl text-white group-hover:text-orange-400 transition-colors"
+                            className="text-lg sm:text-xl text-white group-hover:text-orange-400 transition-colors"
                             aria-hidden="true"
                           />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white font-semibold text-base font-body">
+                          <p className="text-white font-semibold text-sm sm:text-base font-body">
                             Email
                           </p>
-                          <p className="text-gray-400 text-sm font-body group-hover:text-orange-400 transition-colors duration-300">
+                          <p className="text-gray-400 text-xs sm:text-sm font-body group-hover:text-orange-400 transition-colors duration-300">
                             jeremynaphay@gmail.com
                           </p>
                         </div>
@@ -1183,24 +1183,24 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
 
                     {/* Location */}
                     <div className="group">
-                      <div className="flex items-center space-x-3 p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50">
+                      <div className="flex items-center space-x-3 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50">
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                           style={{
                             backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                           }}
                         >
                           <FontAwesomeIcon
                             icon={faLocationDot}
-                            className="text-xl text-white group-hover:text-orange-400 transition-colors"
+                            className="text-lg sm:text-xl text-white group-hover:text-orange-400 transition-colors"
                             aria-hidden="true"
                           />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white font-semibold text-base font-body">
+                          <p className="text-white font-semibold text-sm sm:text-base font-body">
                             Location
                           </p>
-                          <p className="text-gray-400 text-sm font-body">
+                          <p className="text-gray-400 text-xs sm:text-sm font-body">
                             Lyon, France
                           </p>
                         </div>
@@ -1209,24 +1209,24 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
 
                     {/* Availability */}
                     <div className="group">
-                      <div className="flex items-center space-x-3 p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50">
+                      <div className="flex items-center space-x-3 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50">
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                           style={{
                             backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                           }}
                         >
                           <FontAwesomeIcon
                             icon={faBriefcase}
-                            className="text-xl text-white group-hover:text-orange-400 transition-colors"
+                            className="text-lg sm:text-xl text-white group-hover:text-orange-400 transition-colors"
                             aria-hidden="true"
                           />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white font-semibold text-base font-body">
+                          <p className="text-white font-semibold text-sm sm:text-base font-body">
                             Available for
                           </p>
-                          <p className="text-gray-400 text-sm font-body">
+                          <p className="text-gray-400 text-xs sm:text-sm font-body">
                             Freelance & Full-time
                           </p>
                         </div>
@@ -1242,8 +1242,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                 </div>
 
                 {/* Social Links */}
-                <div className="pt-8">
-                  <h4 className="text-base sm:text-lg font-semibold text-white mb-4 font-heading">
+                <div className="pt-6 sm:pt-8">
+                  <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 font-heading">
                     Connect With Me
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1251,22 +1251,22 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105"
+                      className="group flex items-center space-x-3 p-2 sm:p-3 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105"
                     >
                       <div
-                        className="w-8 h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                        className="w-6 h-6 sm:w-8 sm:h-8 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                         style={{
                           backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                         }}
                       >
                         <FontAwesomeIcon
                           icon={faLinkedinIn}
-                          className="text-lg text-white group-hover:text-orange-400 transition-colors"
+                          className="text-sm sm:text-lg text-white group-hover:text-orange-400 transition-colors"
                           aria-hidden="true"
                         />
                       </div>
                       <div>
-                        <p className="text-white font-medium text-sm font-body">
+                        <p className="text-white font-medium text-xs sm:text-sm font-body">
                           LinkedIn
                         </p>
                         <p className="text-gray-400 text-xs font-body">
@@ -1279,9 +1279,9 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </div>
 
               {/* Section de droite - Formulaire de contact */}
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 font-heading">
+              <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-4 sm:space-y-6">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 md:mb-8 font-heading">
                     Send me a
                     <span
                       className="block"
@@ -1291,7 +1291,10 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                     </span>
                   </h3>
 
-                  <form className="space-y-6" onSubmit={handleSubmit}>
+                  <form
+                    className="space-y-4 sm:space-y-6"
+                    onSubmit={handleSubmit}
+                  >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="group">
                         <label className="block text-white font-medium mb-2 font-body">
@@ -1302,7 +1305,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                           name="name"
                           value={form.name}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
                           placeholder="Your name"
                           required
                         />
@@ -1316,7 +1319,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                           name="email"
                           value={form.email}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
                           placeholder="your@email.com"
                           required
                         />
@@ -1331,7 +1334,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                         name="title"
                         value={form.title}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 font-body text-sm sm:text-base"
                         placeholder="Subject of your message"
                         required
                       />
@@ -1344,8 +1347,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                         name="message"
                         value={form.message}
                         onChange={handleInputChange}
-                        rows={5}
-                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body"
+                        rows={4}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 resize-none font-body text-sm sm:text-base"
                         placeholder="Your message..."
                         required
                       ></textarea>
@@ -1354,7 +1357,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                       <button
                         type="submit"
                         disabled={loading}
-                        className="w-full px-6 py-3 rounded-lg font-bold text-base border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
+                        className="w-full px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold text-sm sm:text-base border-2 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20 font-body"
                         style={{
                           backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                           borderColor: "var(--color-grid)",
