@@ -973,7 +973,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             interaction, I specialize in building dynamic websites that feel
             like living worlds.
           </p>
-          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center mt-6 sm:mt-4">
             <button
               className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
               style={{
