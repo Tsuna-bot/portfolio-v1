@@ -307,11 +307,20 @@ const AnimatedCubes = ({
       }
     };
 
+    const handleTouchMove = (event: TouchEvent) => {
+      if (draggedCubeId !== null && isMobile) {
+        // Empêcher le scroll de la page pendant le drag sur mobile
+        event.preventDefault();
+      }
+    };
+
     document.addEventListener("mouseup", handleGlobalMouseUp);
     document.addEventListener("touchend", handleGlobalTouchEnd);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
     return () => {
       document.removeEventListener("mouseup", handleGlobalMouseUp);
       document.removeEventListener("touchend", handleGlobalTouchEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
     };
   }, [draggedCubeId, lastPointerPositions, onDragStateChange, isMobile]);
 
