@@ -59,8 +59,8 @@ const SectionContent: React.FC<{
 
   // Calcul responsive de l'espace disponible
   const isMobile = viewportWidth < 640;
-  const navDotHeight = isMobile ? 120 : 96; // Plus d'espace sur mobile
-  const margin = isMobile ? 32 : 24; // Marge plus importante sur mobile
+  const navDotHeight = isMobile ? 80 : 96; // Moins d'espace sur mobile
+  const margin = isMobile ? 16 : 24; // Marge réduite sur mobile
   const availableHeight = viewportHeight - navDotHeight - margin;
 
   useEffect(() => {
@@ -106,7 +106,8 @@ const SectionContent: React.FC<{
               pointerEvents: isDragging ? "none" : "auto",
               minHeight: "fit-content",
               maxHeight: availableHeight,
-              overflowY: "hidden",
+              overflowY:
+                isMobile && section.id === "contact" ? "auto" : "hidden",
               margin: "0 auto",
             }}
           >
