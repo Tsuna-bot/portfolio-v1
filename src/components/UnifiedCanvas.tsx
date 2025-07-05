@@ -1169,8 +1169,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           {/* Version mobile */}
           <div className="block lg:hidden w-full max-w-2xl mx-auto px-2">
             {/* Titre */}
-            <div className="text-center mb-2">
-              <div className="text-xl font-bold text-white mb-1 font-heading">
+            <div className="text-center mb-4">
+              <div className="text-xl font-bold text-white mb-2 font-heading">
                 Contact
               </div>
               <div
@@ -1179,11 +1179,11 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               ></div>
             </div>
             {/* Texte d'intro */}
-            <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-2">
+            <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-6">
               Ready to bring your ideas to life ?
             </div>
             {/* Formulaire de contact */}
-            <div className="mb-3">
+            <div className="mb-6">
               <form className="space-y-3" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="group">
@@ -1281,11 +1281,11 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </form>
             </div>
             {/* Connect With Me */}
-            <div className="pt-1 pb-1">
-              <h4 className="text-sm font-semibold text-white mb-1 font-heading text-center">
+            <div className="pt-4 pb-4">
+              <h4 className="text-sm font-semibold text-white mb-3 font-heading text-center">
                 Connect With Me
               </h4>
-              <div className="grid grid-cols-2 gap-2 pb-2">
+              <div className="grid grid-cols-2 gap-3 pb-3">
                 {/* LinkedIn */}
                 <a
                   href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
@@ -1329,7 +1329,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </div>
             </div>
             {/* Grille Location & Available for côte à côte - repositionnée en bas */}
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               {/* Location */}
               <div className="group flex items-center justify-center space-x-2 p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
                 <div
