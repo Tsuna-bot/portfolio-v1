@@ -84,7 +84,7 @@ const SectionContent: React.FC<{
     >
       <div className="w-screen h-screen flex items-center justify-center">
         <div
-          className="container mx-auto px-4 text-center"
+          className="container mx-auto text-center"
           style={{
             height: "100%",
             maxHeight: availableHeight,
@@ -92,12 +92,8 @@ const SectionContent: React.FC<{
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            paddingTop: isMobile ? "80px" : "48px", // Position plus haute sur mobile
-            paddingBottom: isMobile
-              ? section.id === "about" || section.id === "contact"
-                ? "80px"
-                : "40px"
-              : "48px", // Plus de padding bottom pour about et contact sur mobile
+            paddingTop: isMobile ? "0px" : "48px", // Pas de padding sur mobile pour toutes les sections
+            paddingBottom: isMobile ? "0px" : "48px", // Pas de padding sur mobile pour toutes les sections
           }}
         >
           <div
