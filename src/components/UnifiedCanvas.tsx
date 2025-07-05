@@ -303,7 +303,7 @@ const NavigationDots: React.FC<{
   onSectionChange: (sectionIndex: number) => void;
 }> = ({ sections, currentSection, onSectionChange }) => {
   return (
-    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 mt-6">
       <div className="bg-black/20 backdrop-blur-sm rounded-full px-5 py-3 border border-white/10 transition-transform duration-300 hover:scale-150">
         <div className="flex space-x-4">
           {sections.map((section, index) => (
@@ -1257,7 +1257,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </form>
             </div>
             {/* Connect With Me */}
-            <div className="pt-1 pb-2">
+            <div className="pt-1 pb-2"></div>
               <h4 className="text-sm font-semibold text-white mb-1 font-heading text-center">
                 Connect With Me
               </h4>
