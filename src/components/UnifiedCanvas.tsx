@@ -955,9 +955,9 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             interaction, I specialize in building dynamic websites that feel
             like living worlds.
           </p>
-          <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
             <button
-              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
+              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -978,7 +978,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">UI/UX Design</span>
             </button>
             <button
-              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -999,7 +999,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">Front-end</span>
             </button>
             <button
-              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1020,7 +1020,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">Adobe Suite</span>
             </button>
             <button
-              className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1160,10 +1160,6 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                 className="w-12 h-0.5 mx-auto"
                 style={{ backgroundColor: "var(--color-grid)" }}
               ></div>
-            </div>
-            {/* Texte d'intro */}
-            <div className="text-sm text-gray-300 leading-relaxed font-body text-center mb-2">
-              Ready to bring your ideas to life ?
             </div>
             {/* Formulaire de contact */}
             <div className="mb-3">
