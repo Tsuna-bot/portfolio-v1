@@ -1282,11 +1282,11 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               </form>
             </div>
             {/* Connect With Me */}
-            <div className="pt-4 pb-4">
-              <h4 className="text-sm font-semibold text-white mb-3 font-heading text-center">
+            <div className="pt-2 pb-2">
+              <h4 className="text-sm font-semibold text-white mb-2 font-heading text-center">
                 Connect With Me
               </h4>
-              <div className="grid grid-cols-2 gap-3 pb-3">
+              <div className="grid grid-cols-2 gap-3 pb-2">
                 {/* LinkedIn */}
                 <a
                   href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
