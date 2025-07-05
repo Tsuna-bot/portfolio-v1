@@ -1281,58 +1281,16 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                 </div>
               </form>
             </div>
-            {/* Connect With Me */}
-            <div className="pt-2 pb-2">
-              <h4 className="text-sm font-semibold text-white mb-2 font-heading text-center">
-                Connect With Me
-              </h4>
-              <div className="grid grid-cols-2 gap-3 pb-2">
-                {/* LinkedIn */}
-                <a
-                  href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 min-w-0 w-full"
-                  aria-label="LinkedIn"
-                >
-                  <div
-                    className="w-6 h-6 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                    style={{
-                      backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faLinkedinIn}
-                      className="text-sm text-white group-hover:text-orange-400 transition-colors"
-                      aria-hidden="true"
-                    />
-                  </div>
-                </a>
-                {/* Email */}
-                <a
-                  href="mailto:jeremynaphay@gmail.com"
-                  className="group flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 min-w-0 w-full"
-                  aria-label="Email"
-                >
-                  <div
-                    className="w-6 h-6 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                    style={{
-                      backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faEnvelope}
-                      className="text-sm text-white group-hover:text-orange-400 transition-colors"
-                      aria-hidden="true"
-                    />
-                  </div>
-                </a>
-              </div>
-            </div>
-            {/* Grille Location & Available for côte à côte - repositionnée en bas */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {/* Location */}
-              <div className="group flex items-center justify-center space-x-2 p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
+            {/* Grille unifiée : Connect With Me + Location + Available */}
+            <div className="grid grid-cols-4 gap-2 mb-6">
+              {/* LinkedIn */}
+              <a
+                href="https://www.linkedin.com/in/j%C3%A9r%C3%A9my-naphay/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 min-w-0 w-full h-12"
+                aria-label="LinkedIn"
+              >
                 <div
                   className="w-6 h-6 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                   style={{
@@ -1340,35 +1298,43 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                   }}
                 >
                   <FontAwesomeIcon
-                    icon={faLocationDot}
+                    icon={faLinkedinIn}
                     className="text-sm text-white group-hover:text-orange-400 transition-colors"
                     aria-hidden="true"
                   />
                 </div>
-                <div className="text-center">
-                  <p className="text-gray-400 text-xs font-body text-center">
-                    Lyon, France
-                  </p>
+              </a>
+              {/* Email */}
+              <a
+                href="mailto:jeremynaphay@gmail.com"
+                className="group flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 hover:border-orange-500/50 transition-all duration-500 group-hover:scale-105 min-w-0 w-full h-12"
+                aria-label="Email"
+              >
+                <div
+                  className="w-6 h-6 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                  style={{
+                    backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faEnvelope}
+                    className="text-sm text-white group-hover:text-orange-400 transition-colors"
+                    aria-hidden="true"
+                  />
                 </div>
+              </a>
+              {/* Location */}
+              <div className="group flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full h-12">
+                <span className="text-gray-400 text-xs font-body text-center">
+                  Lyon
+                </span>
               </div>
               {/* Available for */}
-              <div className="group flex items-center justify-center space-x-2 p-2 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full">
-                <div
-                  className="w-6 h-6 rounded-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                  style={{
-                    backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faBriefcase}
-                    className="text-sm text-white group-hover:text-orange-400 transition-colors"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+              <div className="group flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-700/50 w-full h-12">
+                <div className="flex items-center space-x-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
                   <span className="text-green-400 text-xs font-medium">
-                    Available
+                    Free
                   </span>
                 </div>
               </div>
