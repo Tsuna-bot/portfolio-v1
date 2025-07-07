@@ -1065,8 +1065,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             With a strong foundation in UI/UX design and a sharp eye for
             interaction, I specialize in building dynamic websites that feel
             like living worlds. As a UI Designer and Front-end Developer, I
-            create engaging digital experiences for clients across France and
-            Europe.
+            create engaging digital experiences.
           </p>
           {/* Boutons en grille 2x2 */}
           <div className="grid grid-cols-2 gap-2 mt-4">
@@ -1187,12 +1186,6 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               create engaging digital experiences for clients across France and
               Europe, focusing on modern design principles and cutting-edge web
               technologies.
-            </p>
-            <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
-              My expertise spans from user interface design to front-end
-              development, creating seamless experiences that bridge the gap
-              between aesthetics and functionality. Based in Lyon, I work with
-              clients worldwide to bring their digital visions to life.
             </p>
             <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
               <button
