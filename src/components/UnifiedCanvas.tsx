@@ -1052,7 +1052,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           ></div>
         </div>
         {/* Contenu principal */}
-        <div className="space-y-2">
+        <div className="space-y-8">
           <h3 className="text-lg font-semibold text-white mb-2 font-heading text-center">
             Passionate Creative Dev UI
           </h3>
