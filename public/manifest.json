@@ -1,0 +1,19 @@
+{
+  "name": "Jérémy NAPHAY - UI Designer & Creative Developer",
+  "short_name": "Jérémy NAPHAY",
+  "description": "Portfolio de Jérémy NAPHAY - UI Designer et Creative Developer français basé à Lyon",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff6b35",
+  "icons": [
+    {
+      "src": "/logo-jn.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["design", "development", "portfolio"],
+  "lang": "fr",
+  "dir": "ltr"
+}

@@ -1057,13 +1057,16 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             Passionate Creative Dev UI
           </h3>
           <p className="text-sm text-gray-300 leading-relaxed font-body text-center">
-            Hi ! I'm Jérémy, a french Creative Developer blending technology,
-            design, and storytelling to craft bold, immersive web experiences.
+            Hi ! I'm Jérémy NAPHAY, a french Creative Developer based in Lyon,
+            France. I blend technology, design, and storytelling to craft bold,
+            immersive web experiences.
           </p>
           <p className="text-sm text-gray-300 leading-relaxed font-body text-center">
             With a strong foundation in UI/UX design and a sharp eye for
             interaction, I specialize in building dynamic websites that feel
-            like living worlds.
+            like living worlds. As a UI Designer and Front-end Developer, I
+            create engaging digital experiences for clients across France and
+            Europe.
           </p>
           {/* Boutons en grille 2x2 */}
           <div className="grid grid-cols-2 gap-2 mt-4">
@@ -1172,13 +1175,24 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               Passionate Creative Dev UI
             </h3>
             <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
-              Hi ! I'm Jérémy, a french Creative Developer blending technology,
-              design, and storytelling to craft bold, immersive web experiences.
+              Hi ! I'm Jérémy NAPHAY, a french Creative Developer based in Lyon,
+              France. I blend technology, design, and storytelling to craft
+              bold, immersive web experiences that captivate users and drive
+              engagement.
             </p>
             <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
               With a strong foundation in UI/UX design and a sharp eye for
               interaction, I specialize in building dynamic websites that feel
-              like living worlds.
+              like living worlds. As a UI Designer and Front-end Developer, I
+              create engaging digital experiences for clients across France and
+              Europe, focusing on modern design principles and cutting-edge web
+              technologies.
+            </p>
+            <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
+              My expertise spans from user interface design to front-end
+              development, creating seamless experiences that bridge the gap
+              between aesthetics and functionality. Based in Lyon, I work with
+              clients worldwide to bring their digital visions to life.
             </p>
             <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
               <button
