@@ -29,15 +29,15 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-1000 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center w-screen h-screen transition-all duration-1000 ${
         canHide ? "opacity-0 pointer-events-none" : "opacity-100 bg-black"
       }`}
     >
-      <div className="relative flex flex-col items-center justify-center">
+      <div className="relative flex flex-col items-center justify-center w-full h-full">
         {/* Cercle de progression avec cube 3D au centre */}
-        <div className="relative w-80 h-80 flex items-center justify-center">
+        <div className="relative w-full h-full flex items-center justify-center">
           <svg
-            className="absolute w-80 h-80 left-0 top-0 transform -rotate-90"
+            className="absolute w-full h-full max-w-96 max-h-96 transform -rotate-90"
             viewBox="0 0 100 100"
             aria-hidden="true"
           >
@@ -61,8 +61,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 45}`}
               strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
-              className="transition-all duration-500 ease-out drop-shadow-lg"
-              style={{ filter: "drop-shadow(0 0 10px rgba(255, 102, 0, 0.5))" }}
+              className="transition-all duration-500 ease-out"
             />
           </svg>
           {/* Cube 3D orange */}
