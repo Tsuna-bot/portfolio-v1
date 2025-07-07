@@ -5,6 +5,7 @@ import * as THREE from "three";
 
 const CUBE_SIZE = 0.5;
 const MOBILE_CUBE_SIZE = 1.5;
+const TABLET_CUBE_SIZE = 1.0;
 const VELOCITY_SAMPLES = 50;
 
 type CubeData = {
@@ -174,18 +175,25 @@ const AnimatedCubes = ({
 
   // Détecter si on est sur mobile
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 640);
+      setIsTablet(width >= 640 && width < 1024);
     };
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
-  const currentCubeSize = isMobile ? MOBILE_CUBE_SIZE : CUBE_SIZE;
+  const currentCubeSize = isMobile
+    ? MOBILE_CUBE_SIZE
+    : isTablet
+    ? TABLET_CUBE_SIZE
+    : CUBE_SIZE;
 
   const [cubes, setCubes] = useState<CubeData[]>(() => {
     const specialCube = createSpecialCube(sceneWidth, sceneHeight);

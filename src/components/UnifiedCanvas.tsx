@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
 import emailjs from "@emailjs/browser";
+import { PerspectiveCamera } from "three";
 
 interface Section {
   id: string;
@@ -22,23 +23,46 @@ interface Section {
   content: React.ReactNode;
 }
 
-// Hook pour obtenir l'espacement des sections en fonction de la taille d'écran
+// Hook pour obtenir la largeur d'une section en units 3D, calée sur le viewport
 const useUnitsPerSection = () => {
-  const [unitsPerSection, setUnitsPerSection] = React.useState(7);
+  const { camera, size } = useThree();
+  const [unitsPerSection, setUnitsPerSection] = React.useState(16);
 
   React.useEffect(() => {
     const updateUnits = () => {
-      const width = window.innerWidth;
-      if (width < 640) setUnitsPerSection(12); // Mobile
-      else if (width < 1024) setUnitsPerSection(9); // Tablette
-      else setUnitsPerSection(7); // Desktop
-    };
+      const perspectiveCamera = camera as PerspectiveCamera;
+      const fov = perspectiveCamera.fov * (Math.PI / 180);
+      const depth = perspectiveCamera.position.z - 0; // Les sections sont à z=0
+      const heightInUnits = 2 * Math.tan(fov / 2) * depth;
+      const aspect = size.width / size.height;
+      const widthInUnits = heightInUnits * aspect;
 
+      // Ajustement responsive : beaucoup moins d'espace sur desktop
+      const isMobile = size.width < 640;
+      const isTablet = size.width >= 640 && size.width < 1024;
+      const isLaptop = size.width >= 1024 && size.width < 1800;
+
+      let adjustedWidth;
+      if (isMobile) {
+        // Mobile : utiliser la largeur complète
+        adjustedWidth = widthInUnits;
+      } else if (isTablet) {
+        // Tablet : réduire modérément
+        adjustedWidth = widthInUnits * 0.75;
+      } else if (isLaptop) {
+        // Laptop : réduire significativement
+        adjustedWidth = widthInUnits * 0.5;
+      } else {
+        // Desktop : réduire drastiquement pour éliminer l'espace excessif
+        adjustedWidth = widthInUnits * 0.3;
+      }
+
+      setUnitsPerSection(Math.ceil(adjustedWidth));
+    };
     updateUnits();
     window.addEventListener("resize", updateUnits);
     return () => window.removeEventListener("resize", updateUnits);
-  }, []);
-
+  }, [camera, size.width, size.height]);
   return unitsPerSection;
 };
 
@@ -132,7 +156,7 @@ const SceneController: React.FC<{
   onAdobeFallingComplete: () => void;
   cmsFallingActive: boolean;
   onCmsFallingComplete: () => void;
-  unitsPerSection: number;
+  onUnitsPerSectionChange: (units: number) => void;
 }> = ({
   sections,
   onDragStateChange,
@@ -145,10 +169,16 @@ const SceneController: React.FC<{
   onAdobeFallingComplete,
   cmsFallingActive,
   onCmsFallingComplete,
-  unitsPerSection,
+  onUnitsPerSectionChange,
 }) => {
+  const unitsPerSection = useUnitsPerSection();
   const { camera } = useThree();
   const [isDragging, setIsDragging] = useState(false);
+
+  // Remonter la valeur dynamique
+  useEffect(() => {
+    onUnitsPerSectionChange(unitsPerSection);
+  }, [unitsPerSection, onUnitsPerSectionChange]);
 
   // Animation de la caméra
   useFrame(() => {
@@ -947,7 +977,6 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
   showLoading,
 }) => {
   const location = useLocation();
-  const unitsPerSection = useUnitsPerSection();
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
@@ -971,6 +1000,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
     type: "success" | "error";
     message: string;
   } | null>(null);
+  // Ajout du state pour unitsPerSection
+  const [unitsPerSection, setUnitsPerSection] = useState(16);
 
   // Variables pour le swipe mobile
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(
@@ -2097,7 +2128,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           onAdobeFallingComplete={() => setAdobeFallingActive(false)}
           cmsFallingActive={cmsFallingActive}
           onCmsFallingComplete={() => setCmsFallingActive(false)}
-          unitsPerSection={unitsPerSection}
+          onUnitsPerSectionChange={setUnitsPerSection}
         />
       </Canvas>
 
