@@ -1040,9 +1040,9 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
   const aboutSection = (
     <>
       {/* Version mobile */}
-      <div className="block lg:hidden w-full max-w-2xl mx-auto px-2">
+      <div className="block lg:hidden w-full max-w-2xl mx-auto px-2 flex flex-col justify-center items-center min-h-screen">
         {/* Titre */}
-        <div className="text-center mb-4">
+        <div className="text-center mb-3">
           <div className="text-xl font-bold text-white mb-2 font-heading">
             About
           </div>
@@ -1052,8 +1052,8 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           ></div>
         </div>
         {/* Contenu principal */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-white mb-3 font-heading text-center">
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-white mb-2 font-heading text-center">
             Passionate Creative Dev UI
           </h3>
           <p className="text-sm text-gray-300 leading-relaxed font-body text-center">
@@ -1068,7 +1068,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             create engaging digital experiences.
           </p>
           {/* Boutons en grille 2x2 */}
-          <div className="grid grid-cols-2 gap-2 mt-4">
+          <div className="grid grid-cols-2 gap-2 mt-3">
             <button
               className="w-full px-3 py-2 rounded-lg shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-xs font-bold"
               style={{
