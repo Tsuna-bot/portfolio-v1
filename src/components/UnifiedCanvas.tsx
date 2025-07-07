@@ -1039,32 +1039,36 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
   // Déclaration du contenu About ici pour accès au handler
   const aboutSection = (
     <>
-      <div className="text-center mb-8 sm:mb-12 md:mb-16">
-        <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-heading">
-          About
+      {/* Version mobile */}
+      <div className="block lg:hidden w-full max-w-2xl mx-auto px-2">
+        {/* Titre */}
+        <div className="text-center mb-4">
+          <div className="text-xl font-bold text-white mb-2 font-heading">
+            About
+          </div>
+          <div
+            className="w-12 h-0.5 mx-auto"
+            style={{ backgroundColor: "var(--color-grid)" }}
+          ></div>
         </div>
-        <div
-          className="w-24 h-1 mx-auto"
-          style={{ backgroundColor: "var(--color-grid)" }}
-        ></div>
-      </div>
-      <div className="max-w-4xl mx-auto text-center px-4">
-        <div className="space-y-4 sm:space-y-6">
-          <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4 font-heading">
+        {/* Contenu principal */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-white mb-3 font-heading text-center">
             Passionate Creative Dev UI
           </h3>
-          <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
+          <p className="text-sm text-gray-300 leading-relaxed font-body text-center">
             Hi ! I'm Jérémy, a french Creative Developer blending technology,
             design, and storytelling to craft bold, immersive web experiences.
           </p>
-          <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
+          <p className="text-sm text-gray-300 leading-relaxed font-body text-center">
             With a strong foundation in UI/UX design and a sharp eye for
             interaction, I specialize in building dynamic websites that feel
             like living worlds.
           </p>
-          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
+          {/* Boutons en grille 2x2 */}
+          <div className="grid grid-cols-2 gap-2 mt-4">
             <button
-              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
+              className="w-full px-3 py-2 rounded-lg shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-xs font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1085,7 +1089,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">UI/UX Design</span>
             </button>
             <button
-              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+              className="w-full px-3 py-2 rounded-lg shadow-lg border-2 transition-all duration-300 cursor-pointer text-xs font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1106,7 +1110,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">Front-end</span>
             </button>
             <button
-              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+              className="w-full px-3 py-2 rounded-lg shadow-lg border-2 transition-all duration-300 cursor-pointer text-xs font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1127,7 +1131,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               <span className="font-bold">Adobe Suite</span>
             </button>
             <button
-              className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+              className="w-full px-3 py-2 rounded-lg shadow-lg border-2 transition-all duration-300 cursor-pointer text-xs font-bold"
               style={{
                 backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
                 borderColor: "var(--color-grid)",
@@ -1147,6 +1151,121 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
             >
               <span className="font-bold">CMS</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Version desktop */}
+      <div className="hidden lg:block">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-heading">
+            About
+          </div>
+          <div
+            className="w-24 h-1 mx-auto"
+            style={{ backgroundColor: "var(--color-grid)" }}
+          ></div>
+        </div>
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <div className="space-y-4 sm:space-y-6">
+            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4 font-heading">
+              Passionate Creative Dev UI
+            </h3>
+            <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
+              Hi ! I'm Jérémy, a french Creative Developer blending technology,
+              design, and storytelling to craft bold, immersive web experiences.
+            </p>
+            <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
+              With a strong foundation in UI/UX design and a sharp eye for
+              interaction, I specialize in building dynamic websites that feel
+              like living worlds.
+            </p>
+            <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
+              <button
+                className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer about-ux-btn text-sm sm:text-base md:text-lg font-bold"
+                style={{
+                  backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  borderColor: "var(--color-grid)",
+                  color: "var(--color-grid)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.2)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.1)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                onClick={handleUxDesignClick}
+              >
+                <span className="font-bold">UI/UX Design</span>
+              </button>
+              <button
+                className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+                style={{
+                  backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  borderColor: "var(--color-grid)",
+                  color: "var(--color-grid)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.2)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.1)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                onClick={handleFrontendClick}
+              >
+                <span className="font-bold">Front-end</span>
+              </button>
+              <button
+                className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+                style={{
+                  backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  borderColor: "var(--color-grid)",
+                  color: "var(--color-grid)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.2)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.1)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                onClick={handleAdobeClick}
+              >
+                <span className="font-bold">Adobe Suite</span>
+              </button>
+              <button
+                className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+                style={{
+                  backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  borderColor: "var(--color-grid)",
+                  color: "var(--color-grid)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.2)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.1)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                onClick={handleCmsClick}
+              >
+                <span className="font-bold">CMS</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
