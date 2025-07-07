@@ -1052,7 +1052,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
           ></div>
         </div>
         {/* Contenu principal */}
-        <div className="space-y-8">
+        <div className="space-y-10">
           <h3 className="text-lg font-semibold text-white mb-2 font-heading text-center">
             Passionate Creative Dev UI
           </h3>
@@ -1183,9 +1183,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               With a strong foundation in UI/UX design and a sharp eye for
               interaction, I specialize in building dynamic websites that feel
               like living worlds. As a UI Designer and Front-end Developer, I
-              create engaging digital experiences for clients across France and
-              Europe, focusing on modern design principles and cutting-edge web
-              technologies.
+              create engaging digital experiences.
             </p>
             <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-2 sm:gap-4 justify-center">
               <button
