@@ -543,10 +543,12 @@ const CubeGame = () => {
       style={{ touchAction: "none" }}
     >
       {/* Menu burger pour mobile */}
-      <BurgerMenu
-        onBack={() => (window.location.href = "/")}
-        onReset={handleReset}
-      />
+      {!showFinalScore && (
+        <BurgerMenu
+          onBack={() => (window.location.href = "/")}
+          onReset={handleReset}
+        />
+      )}
 
       {/* Bouton de retour (desktop uniquement) */}
       <button
@@ -826,6 +828,44 @@ const CubeGame = () => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showFinalScore && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2 sm:px-4 py-4 sm:py-8">
+          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-8 sm:py-8 lg:px-16 lg:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-[95vw] sm:max-w-[90vw] lg:max-w-2xl mx-auto overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
+            {/* Effet holographique de fond */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="relative z-10">
+              <div className="text-center space-y-3 sm:space-y-4 lg:space-y-6 mb-4 sm:mb-6 lg:mb-8">
+                <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
+                  Good job !
+                </h2>
+                <div className="text-sm sm:text-base lg:text-lg text-orange-400 mb-2 sm:mb-3 lg:mb-4">
+                  Final Score: {score} targets in 30s
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 sm:gap-3 lg:gap-4 justify-center w-full">
+                <button
+                  onClick={handleReset}
+                  className="bg-orange-500 text-white w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-6 lg:py-4 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm sm:text-base lg:text-lg touch-manipulation"
+                  aria-label="Play Again"
+                >
+                  Play Again
+                </button>
+                <button
+                  onClick={() => (window.location.href = "/")}
+                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-6 lg:py-4 rounded-full font-bold shadow-lg text-sm sm:text-base lg:text-lg touch-manipulation"
+                  aria-label="Retour à l'accueil"
+                >
+                  ← Back
+                </button>
+              </div>
             </div>
           </div>
         </div>

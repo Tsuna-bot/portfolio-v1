@@ -805,7 +805,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
 
             {/* Scoreboard - colonne de droite (plus d'espace) */}
             <div className="absolute top-0 right-0 w-[calc(100%-5rem)] h-full">
-              <div className="absolute top-4 right-4 left-4 bg-black bg-opacity-90 text-white p-3 rounded-xl border border-orange-500">
+              <div className="absolute top-4 right-4 left-4 bg-black bg-opacity-90 text-white p-3 px-1 rounded-xl border border-orange-500">
                 <div className="text-center">
                   <div className="text-base sm:text-lg font-bold text-orange-400 mb-3">
                     Frame {currentRoll} / 5
@@ -813,12 +813,12 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
 
                   {/* Score par manche avec plus d'espace */}
                   {rolls.length > 0 && (
-                    <div className="mb-3 h-24">
-                      <div className="flex flex-nowrap overflow-x-auto w-full gap-2 justify-center h-full scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent">
+                    <div className="mb-3 h-14">
+                      <div className="flex flex-nowrap overflow-x-auto w-full gap-1 justify-center h-full scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent min-w-[260px]">
                         {rolls.map((roll, index) => (
                           <div
                             key={index}
-                            className={`flex flex-col items-center justify-center h-full px-2 rounded-xl text-xl font-bold border min-w-[72px] text-center leading-tight ${
+                            className={`flex flex-col items-center justify-center h-full min-h-[32px] px-1 py-0 rounded-xl text-base font-bold border min-w-[48px] text-center leading-tight ${
                               roll === 10
                                 ? "bg-green-600 text-white border-green-500"
                                 : roll >= 7
@@ -828,10 +828,10 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                                 : "bg-gray-600 text-white border-gray-500"
                             }`}
                           >
-                            <div className="text-base opacity-70 mb-1">
+                            <div className="text-xs opacity-70 mb-1">
                               F{index + 1}
                             </div>
-                            <div className="text-2xl font-bold">{roll}</div>
+                            <div className="text-base font-bold">{roll}</div>
                           </div>
                         ))}
                       </div>
@@ -840,7 +840,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
 
                   {/* Score total avec plus d'espace */}
                   {rolls.length > 0 && (
-                    <div className="py-3 px-2 text-2xl text-orange-300 font-extrabold w-full">
+                    <div className="py-3 px-2 text-base sm:text-sm text-orange-300 font-extrabold w-full">
                       Total : {rolls.reduce((sum, roll) => sum + roll, 0)} / 50
                       pins
                     </div>

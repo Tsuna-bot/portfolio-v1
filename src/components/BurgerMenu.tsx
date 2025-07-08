@@ -33,41 +33,23 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({
 
   return (
     <>
-      {/* Bouton burger */}
-      <button
-        onClick={handleToggle}
-        className="fixed top-4 left-4 z-50 bg-black/80 border border-orange-500 text-orange-400 p-3 rounded-full shadow-lg backdrop-blur-sm touch-manipulation sm:hidden"
-        aria-label="Menu"
-      >
-        <div className="w-6 h-6 flex flex-col justify-center items-center">
-          <div
-            className={`w-5 h-0.5 bg-orange-400 transition-all duration-300 ${
-              isMenuOpen ? "rotate-45 translate-y-1" : ""
-            }`}
-          />
-          <div
-            className={`w-5 h-0.5 bg-orange-400 transition-all duration-300 mt-1 ${
-              isMenuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <div
-            className={`w-5 h-0.5 bg-orange-400 transition-all duration-300 mt-1 ${
-              isMenuOpen ? "-rotate-45 -translate-y-1" : ""
-            }`}
-          />
-        </div>
-      </button>
-
-      {/* Menu overlay */}
+      {/* Overlay cliquable pour fermer le menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 sm:hidden">
-          <div className="absolute top-16 left-4 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-3 rounded-xl shadow-2xl backdrop-blur-sm min-w-[200px]">
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 sm:hidden"
+          onClick={handleToggle}
+          aria-label="Fermer le menu"
+        >
+          {/* Menu réel, stoppe la propagation du clic */}
+          <div
+            className="absolute top-16 left-4 z-60 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-3 rounded-xl shadow-2xl backdrop-blur-sm min-w-[200px] pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Effet holographique de fond */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
             <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
-
             <div className="relative z-10 space-y-3">
               <button
                 onClick={handleBack}
@@ -87,6 +69,25 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({
           </div>
         </div>
       )}
+      {/* Bouton burger toujours au-dessus et net */}
+      <button
+        onClick={handleToggle}
+        className="fixed top-4 left-4 z-[100] bg-black/80 border border-orange-500 text-orange-400 p-3 rounded-full shadow-lg backdrop-blur-0 touch-manipulation sm:hidden pointer-events-auto"
+        aria-label="Menu"
+      >
+        <div className="w-6 h-6 flex flex-col justify-center items-center">
+          <div
+            className={`w-5 h-0.5 bg-orange-400 transition-all duration-300 ${
+              isMenuOpen ? "rotate-45 translate-y-0.5" : ""
+            }`}
+          />
+          <div
+            className={`w-5 h-0.5 bg-orange-400 transition-all duration-300 mt-1 ${
+              isMenuOpen ? "-rotate-45 -translate-y-1" : ""
+            }`}
+          />
+        </div>
+      </button>
     </>
   );
 };
