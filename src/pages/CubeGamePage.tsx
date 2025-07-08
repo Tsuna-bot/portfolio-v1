@@ -657,7 +657,7 @@ const CubeGame = () => {
           {/* Version mobile : deux blocs séparés uniquement si !showFinalScore */}
           {!showFinalScore && (
             <div className="block sm:hidden">
-              <div className="absolute top-16 left-4 z-50">
+              <div className="absolute top-24 left-4 z-50">
                 <div className="bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 rounded-xl shadow-2xl backdrop-blur-sm w-auto text-center">
                   <div
                     className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
@@ -751,17 +751,17 @@ const CubeGame = () => {
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-4">
                       <button
                         onClick={handleReset}
-                        className="bg-orange-500 text-white w-full sm:w-auto px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm sm:text-base"
-                        aria-label="Rejouer"
+                        className="bg-orange-500 text-white w-full sm:w-32 px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm sm:text-base touch-manipulation"
+                        aria-label="Play Again"
                       >
                         Play Again
                       </button>
                       <button
                         onClick={() => (window.location.href = "/")}
-                        className="bg-[#18181b] border border-orange-500 text-orange-400 w-full sm:w-auto px-4 py-2 rounded-lg font-bold hover:bg-orange-500 hover:text-white transition-colors text-sm sm:text-base"
+                        className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full sm:w-32 px-4 py-3 rounded-full font-bold shadow-lg text-sm sm:text-base touch-manipulation"
                         aria-label="Retour à l'accueil"
                       >
-                        Back
+                        ← Back
                       </button>
                     </div>
                   </div>
