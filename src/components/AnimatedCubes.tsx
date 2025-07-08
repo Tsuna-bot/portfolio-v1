@@ -17,6 +17,7 @@ type CubeData = {
   isDragged: boolean;
   color: string;
   isSpecial: boolean;
+  isBowling?: boolean;
 };
 
 const createSpecialCube = (
@@ -52,6 +53,43 @@ const createSpecialCube = (
     isDragged: false,
     color: "#ffef36",
     isSpecial: true,
+  };
+};
+
+const createBowlingCube = (
+  sceneWidth: number,
+  sceneHeight: number
+): CubeData => {
+  return {
+    position: [
+      (Math.random() - 0.5) * sceneWidth * 0.5,
+      (Math.random() - 0.5) * sceneHeight * 0.5,
+      0,
+    ] as [number, number, number],
+    direction: [
+      (Math.random() - 0.5) * 0.01,
+      (Math.random() - 0.5) * 0.01,
+      0,
+    ] as [number, number, number],
+    originalDirection: [
+      (Math.random() - 0.5) * 0.01,
+      (Math.random() - 0.5) * 0.01,
+      0,
+    ] as [number, number, number],
+    rotation: [
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+    ] as [number, number, number],
+    rotationSpeed: [
+      (Math.random() - 0.5) * 0.02,
+      (Math.random() - 0.5) * 0.02,
+      (Math.random() - 0.5) * 0.02,
+    ] as [number, number, number],
+    isDragged: false,
+    color: "#ffffff",
+    isSpecial: false,
+    isBowling: true,
   };
 };
 
@@ -116,6 +154,7 @@ const Cube = ({
   onPointerOver,
   onPointerOut,
   specialFlicker,
+  bowlingFlicker,
   cubeSize,
 }: {
   cubeData: CubeData;
@@ -124,6 +163,7 @@ const Cube = ({
   onPointerOver: () => void;
   onPointerOut: () => void;
   specialFlicker?: number;
+  bowlingFlicker?: number;
   cubeSize: number;
 }) => {
   return (
@@ -147,6 +187,8 @@ const Cube = ({
           emissiveIntensity={
             cubeData.isSpecial && specialFlicker !== undefined
               ? specialFlicker
+              : cubeData.isBowling && bowlingFlicker !== undefined
+              ? bowlingFlicker
               : cubeData.isDragged
               ? 0.2
               : 0.05
@@ -197,8 +239,9 @@ const AnimatedCubes = ({
 
   const [cubes, setCubes] = useState<CubeData[]>(() => {
     const specialCube = createSpecialCube(sceneWidth, sceneHeight);
+    const bowlingCube = createBowlingCube(sceneWidth, sceneHeight);
     const normalCubes = generateRandomCubes(sceneWidth, sceneHeight);
-    return [specialCube, ...normalCubes];
+    return [specialCube, bowlingCube, ...normalCubes];
   });
 
   const [draggedCubeId, setDraggedCubeId] = useState<number | null>(null);
@@ -208,9 +251,12 @@ const AnimatedCubes = ({
 
   // Flicker pour la lumière du cube spécial
   const flickerRef = useRef(0.6);
+  // Flicker pour la lumière du cube bowling
+  const bowlingFlickerRef = useRef(0.3);
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     flickerRef.current = 0.55 + 0.15 * Math.sin(t * 8);
+    bowlingFlickerRef.current = 0.25 + 0.1 * Math.sin(t * 6);
   });
 
   useEffect(() => {
@@ -343,6 +389,12 @@ const AnimatedCubes = ({
       return;
     }
 
+    if (cube && cube.isBowling) {
+      // Si c'est le cube bowling, naviguer vers le jeu bowling
+      window.location.href = "/bowling";
+      return;
+    }
+
     // Empêcher le comportement par défaut sur mobile pour éviter le zoom
     if (isMobile) {
       event.nativeEvent.preventDefault();
@@ -365,7 +417,7 @@ const AnimatedCubes = ({
   const handlePointerOver = (index: number) => {
     if (draggedCubeId === null && !isMobile) {
       const cube = cubes[index];
-      if (cube && cube.isSpecial) {
+      if (cube && (cube.isSpecial || cube.isBowling)) {
         document.body.style.cursor = "pointer";
       } else {
         document.body.style.cursor = "grab";
@@ -451,8 +503,8 @@ const AnimatedCubes = ({
           cube.direction[0] *= -1;
         }
 
-        // Logique spéciale pour le cube bleu - le garder toujours visible
-        if (cube.isSpecial) {
+        // Logique spéciale pour les cubes spéciaux - les garder toujours visibles
+        if (cube.isSpecial || cube.isBowling) {
           const isNearLeftEdge = newPosition[0] <= leftBound + CUBE_SIZE;
           const isNearRightEdge = newPosition[0] >= rightBound - CUBE_SIZE;
 
@@ -563,20 +615,25 @@ const AnimatedCubes = ({
         };
       });
 
-      const normalCubes = updated.filter((cube) => !cube.isSpecial);
+      const normalCubes = updated.filter(
+        (cube) => !cube.isSpecial && !cube.isBowling
+      );
       const specialCube = updated.find((cube) => cube.isSpecial);
+      const bowlingCube = updated.find((cube) => cube.isBowling);
 
       const NOMBRE_MINIMUM = 20;
-      if (normalCubes.length < NOMBRE_MINIMUM - 1) {
-        const toAdd = NOMBRE_MINIMUM - 1 - normalCubes.length;
+      if (normalCubes.length < NOMBRE_MINIMUM - 2) {
+        const toAdd = NOMBRE_MINIMUM - 2 - normalCubes.length;
         const newCubes = generateRandomCubes(sceneWidth, sceneHeight).slice(
           0,
           toAdd
         );
 
-        return specialCube
-          ? [specialCube, ...normalCubes, ...newCubes]
-          : [...normalCubes, ...newCubes];
+        const result = [];
+        if (specialCube) result.push(specialCube);
+        if (bowlingCube) result.push(bowlingCube);
+        result.push(...normalCubes, ...newCubes);
+        return result;
       }
 
       return updated;
@@ -587,13 +644,22 @@ const AnimatedCubes = ({
     <>
       {cubes.map((cube, index) => (
         <Cube
-          key={cube.isSpecial ? "special-cube" : index}
+          key={
+            cube.isSpecial
+              ? "special-cube"
+              : cube.isBowling
+              ? "bowling-cube"
+              : index
+          }
           cubeData={cube}
           index={index}
           onPointerDown={handlePointerDown}
           onPointerOver={() => handlePointerOver(index)}
           onPointerOut={handlePointerOut}
           specialFlicker={cube.isSpecial ? flickerRef.current : undefined}
+          bowlingFlicker={
+            cube.isBowling ? bowlingFlickerRef.current : undefined
+          }
           cubeSize={currentCubeSize}
         />
       ))}
@@ -605,6 +671,19 @@ const AnimatedCubes = ({
             position={cube.position}
             color="#ffef36"
             intensity={flickerRef.current}
+            distance={2}
+            decay={1}
+          />
+        ) : null
+      )}
+      {/* Lumière qui suit le cube bowling et scintille */}
+      {cubes.map((cube) =>
+        cube.isBowling ? (
+          <pointLight
+            key="bowling-cube-light"
+            position={cube.position}
+            color="#ffffff"
+            intensity={bowlingFlickerRef.current}
             distance={2}
             decay={1}
           />

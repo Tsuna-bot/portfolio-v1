@@ -10,15 +10,15 @@ interface BowlingPageProps {
 
 const PIN_POSITIONS: [number, number, number][] = [
   [0, 0.4, 35],
-  [-0.3, 0.4, 35.5],
-  [0.3, 0.4, 35.5],
-  [-0.6, 0.4, 36],
+  [-0.5, 0.4, 35.5],
+  [0.5, 0.4, 35.5],
+  [-1.0, 0.4, 36],
   [0, 0.4, 36],
-  [0.6, 0.4, 36],
-  [-0.9, 0.4, 36.5],
-  [-0.3, 0.4, 36.5],
-  [0.3, 0.4, 36.5],
-  [0.9, 0.4, 36.5],
+  [1.0, 0.4, 36],
+  [-1.5, 0.4, 36.5],
+  [-0.5, 0.4, 36.5],
+  [0.5, 0.4, 36.5],
+  [1.5, 0.4, 36.5],
 ];
 const BALL_START: [number, number, number] = [0, 0.9, 5]; // y = 1.2 pour être encore plus haute avant le lancer
 
@@ -97,13 +97,13 @@ const BowlingPinPhysic = React.forwardRef<
     <RigidBody
       key={`pin-${pinIndex}`}
       ref={ref}
-      restitution={0.4}
-      friction={0.3}
+      restitution={0.1}
+      friction={0.8}
       position={position}
       canSleep={false}
-      linearDamping={0.3}
-      angularDamping={0.3}
-      mass={0.15}
+      linearDamping={0.7}
+      angularDamping={0.7}
+      mass={0.4}
     >
       {/* Base solide */}
       <CuboidCollider args={[0.08, 0.05, 0.08]} position={[0, 0.025, 0]} />
@@ -196,14 +196,14 @@ const BowlingBallPhysic = React.forwardRef<
       <RigidBody
         ref={ref}
         colliders="ball"
-        restitution={0.01}
-        friction={0.005}
+        restitution={0.02}
+        friction={0.5}
         position={position}
         canSleep={false}
-        linearDamping={0.005}
-        angularDamping={0.02}
+        linearDamping={0.3}
+        angularDamping={0.4}
         type={isLaunched ? "dynamic" : "kinematicPosition"}
-        mass={100}
+        mass={40}
         ccd={true}
       >
         <mesh castShadow receiveShadow onPointerDown={onPointerDown}>
@@ -255,35 +255,28 @@ const BowlingLane: React.FC = () => (
   </group>
 );
 
-// Composant AimCurve - courbe simple qui montre où la boule va atterrir
+// Composant AimCurve - forme plate qui suit la courbe
 const AimCurve = ({ angle, power }: { angle: number; power: number }) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
   // Courbe basée sur la vraie physique de la boule
-  const start = new THREE.Vector3().set(0, 1.1, 5); // Au-dessus de la boule
+  const start = new THREE.Vector3().set(0, 0.05, 8);
 
   // Calcul basé sur la vélocité réelle de la boule
-  const speed = 1.5 * power * 6; // Même vitesse que la boule
+  const speed = 2 * power * 6;
   const vx = Math.sin(angle) * speed;
   const vz = Math.cos(angle) * speed;
-  const vy = (power - 1) * 2; // Même vélocité verticale que la boule
 
-  // Point intermédiaire (après 0.2 secondes)
-  const t1 = 0.2;
-  const midX = vx * t1;
-  const midY = 1.1 + vy * t1 - 0.5 * 9.81 * t1 * t1; // Physique avec gravité
-  const midZ = 5 + vz * t1;
-  const mid = new THREE.Vector3().set(midX, midY, midZ);
-
-  // Point final (après 0.4 secondes)
-  const t2 = 0.4;
+  // Point final
+  const t2 = 0.6;
   const endX = vx * t2;
-  const endY = 1.1 + vy * t2 - 0.5 * 9.81 * t2 * t2; // Physique avec gravité
   const endZ = 5 + vz * t2;
-  const end = new THREE.Vector3().set(endX, endY, endZ);
 
-  // Courbe simple avec 3 points
-  const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+  const end = new THREE.Vector3().set(endX, 0.05, endZ);
+
+  // Ligne droite au niveau du sol
+  const curve = new THREE.LineCurve3(start, end);
+
   useFrame(({ clock }) => {
     if (meshRef.current && meshRef.current.material) {
       const mat = meshRef.current.material as THREE.MeshPhysicalMaterial;
@@ -293,9 +286,10 @@ const AimCurve = ({ angle, power }: { angle: number; power: number }) => {
       }
     }
   });
+
   return (
     <mesh ref={meshRef}>
-      <tubeGeometry args={[curve, 64, 0.015, 8, false]} />
+      <tubeGeometry args={[curve, 64, 0.15, 8, false]} />
       <meshPhysicalMaterial
         color="#ff6b00"
         emissive="#ff6b00"
@@ -318,7 +312,17 @@ const BowlingScene: React.FC<{
   ballRef: React.RefObject<React.ElementRef<typeof RigidBody> | null>;
   pinRefs: React.RefObject<React.ElementRef<typeof RigidBody> | null>[];
   resetSignal: number;
-}> = ({ ballRef, pinRefs, resetSignal }) => {
+  ballLaunched: boolean;
+  setBallLaunched: (launched: boolean) => void;
+  gameFinished: boolean;
+}> = ({
+  ballRef,
+  pinRefs,
+  resetSignal,
+  ballLaunched,
+  setBallLaunched,
+  gameFinished,
+}) => {
   const { camera } = useThree();
   const [isAiming, setIsAiming] = useState(false);
   const [aimAngle, setAimAngle] = useState(0);
@@ -326,14 +330,12 @@ const BowlingScene: React.FC<{
   const [finalPower, setFinalPower] = useState(1);
   const [startX, setStartX] = useState<number | null>(null);
   const [startY, setStartY] = useState<number | null>(null);
-  const [ballLaunched, setBallLaunched] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
   // Fonction sécurisée pour réinitialiser la boule
   const resetBallSafely = useCallback(() => {
     if (ballRef.current && !isResetting) {
       try {
-        console.log("🎳 Remise de la boule en position de départ");
         setIsResetting(true);
 
         // Vérifier que le contexte WebGL est toujours valide
@@ -346,8 +348,6 @@ const BowlingScene: React.FC<{
           );
           ballRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
           ballRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
-
-          console.log("🎳 Boule remise en mode kinematic");
 
           // Réinitialiser l'état
           setBallLaunched(false);
@@ -363,7 +363,7 @@ const BowlingScene: React.FC<{
         setIsResetting(false);
       }
     } else {
-      console.log("🎳 ballRef.current est null ou reset en cours");
+      // ballRef.current est null ou reset en cours
     }
   }, [ballRef]);
 
@@ -390,8 +390,6 @@ const BowlingScene: React.FC<{
   // Reset la boule et les quilles quand resetSignal change
   useEffect(() => {
     if (resetSignal === 0) return; // Éviter le reset initial
-
-    console.log("🎳 Reset de la boule - signal:", resetSignal);
 
     // Utiliser setTimeout pour s'assurer que les composants sont montés
     const timer = setTimeout(() => {
@@ -471,12 +469,9 @@ const BowlingScene: React.FC<{
   }, [isAiming, startX, startY, isResetting]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    console.log("🎳 handlePointerDown appelé");
-    if (isAiming || isResetting) {
-      console.log("🎳 Déjà en train de viser ou reset en cours, ignoré");
+    if (isAiming || isResetting || gameFinished) {
       return;
     }
-    console.log("🎳 Début du lancer - boule en mode kinematic");
     setIsAiming(true);
     setStartX(e.clientX);
     setStartY(e.clientY);
@@ -486,9 +481,9 @@ const BowlingScene: React.FC<{
   // Calculer les vélocités de lancement basées sur la courbe de visée
   const launchVelocity: [number, number, number] | undefined = ballLaunched
     ? [
-        Math.sin(aimAngle) * 1.2 * finalPower * 8, // Vitesse réaliste
-        (finalPower - 1) * 2, // Vélocité verticale inchangée pour garder la trajectoire
-        Math.cos(aimAngle) * 1.2 * finalPower * 8, // Vitesse réaliste
+        Math.sin(aimAngle) * 2 * finalPower * 8, // Vitesse horizontale
+        0, // Pas de vélocité verticale - la boule roule seulement
+        Math.cos(aimAngle) * 2 * finalPower * 8, // Vitesse horizontale
       ]
     : undefined;
 
@@ -579,34 +574,11 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
     useRef<React.ElementRef<typeof RigidBody>>(null),
   ];
   const [gameStarted, setGameStarted] = useState(false);
-  const [currentFrame, setCurrentFrame] = useState(1);
-  const [currentRoll, setCurrentRoll] = useState(1);
-  const [score, setScore] = useState(0);
-  const [frames, setFrames] = useState<number[][]>([]);
-  const [gameOver, setGameOver] = useState(false);
   const [resetSignal, setResetSignal] = useState(0);
-
-  // Score = nombre de quilles couchées (angle d'inclinaison > 0.5 radian)
-  const getKnockedPins = () => {
-    let count = 0;
-    pinRefs.forEach((ref, index) => {
-      if (ref.current) {
-        try {
-          const rot = ref.current.rotation();
-          // Si la quille est inclinée de plus de 0.5 radian sur X ou Z
-          if (Math.abs(rot.x) > 0.5 || Math.abs(rot.z) > 0.5) {
-            count++;
-          }
-        } catch (error) {
-          console.error(
-            `🎳 Erreur lors de la vérification de la quille ${index}:`,
-            error
-          );
-        }
-      }
-    });
-    return count;
-  };
+  const [currentRoll, setCurrentRoll] = useState(1);
+  const [rolls, setRolls] = useState<number[]>([]);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [ballLaunched, setBallLaunched] = useState(false);
 
   const handleBack = () => {
     navigate("/");
@@ -615,69 +587,94 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
 
   const handleStartGame = () => {
     setGameStarted(true);
-    setCurrentFrame(1);
-    setCurrentRoll(1);
-    setScore(0);
-    setFrames([]);
-    setGameOver(false);
     setResetSignal((s) => s + 1);
+    setCurrentRoll(1);
+    setRolls([]);
+    setGameFinished(false);
+    setBallLaunched(false);
   };
 
-  const handleResetGame = () => {
-    setGameStarted(false);
-    setCurrentFrame(1);
-    setCurrentRoll(1);
-    setScore(0);
-    setFrames([]);
-    setGameOver(false);
-    setResetSignal((s) => s + 1);
-  };
+  // Gérer le passage au lancer suivant avec vérification des quilles tombées
+  useEffect(() => {
+    if (!gameStarted || gameFinished || !ballLaunched) return;
 
-  const handleRoll = () => {
-    // Score = nombre de quilles tombées
-    const pinsHit = getKnockedPins();
-    const newFrames = [...frames];
-    if (currentRoll === 1) {
-      newFrames.push([pinsHit]);
-    } else {
-      const currentFrameData = newFrames[currentFrame - 1];
-      if (currentFrameData) {
-        currentFrameData.push(pinsHit);
-      }
+    // Vérifier si le jeu est terminé (même si aucune quille n'est tombée)
+    if (rolls.length >= 5) {
+      setGameFinished(true);
+      return;
     }
-    setFrames(newFrames);
-    setScore(score + pinsHit);
-    if (currentRoll === 1 && pinsHit === 10) {
-      setCurrentFrame(currentFrame + 1);
-      setCurrentRoll(1);
-    } else if (currentRoll === 2) {
-      setCurrentFrame(currentFrame + 1);
-      setCurrentRoll(1);
-    } else {
-      setCurrentRoll(2);
-    }
-    if (currentFrame >= 10) {
-      setGameOver(true);
-    }
-    // Reset la boule pour le prochain lancer - avec gestion d'erreur sécurisée
-    if (ballRef.current) {
-      try {
-        ballRef.current.setTranslation(
-          { x: BALL_START[0], y: BALL_START[1], z: BALL_START[2] },
-          true
-        );
-        ballRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
-        ballRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
-      } catch (error) {
-        console.error(
-          "🎳 Erreur lors du reset de la boule dans handleRoll:",
-          error
-        );
-        // Forcer un reset complet si la boule est dans un état incohérent
-        setResetSignal((s) => s + 1);
-      }
-    }
-  };
+
+    // Fonction pour compter les quilles tombées
+    const countFallenPins = () => {
+      let finalCount = 0;
+      pinRefs.forEach((ref) => {
+        if (ref.current) {
+          try {
+            const position = ref.current.translation();
+            const rotation = ref.current.rotation();
+
+            // Méthode de détection améliorée : vérifier l'inclinaison ET la position
+            const isFallenByPosition = position.y < 0.1; // Quille très basse
+            const isFallenByRotation =
+              Math.abs(rotation.x) > 0.3 || Math.abs(rotation.z) > 0.3; // Quille inclinée
+
+            // Une quille est considérée tombée si elle est basse OU très inclinée
+            if (isFallenByPosition || isFallenByRotation) {
+              finalCount++;
+            }
+          } catch {
+            // Ignorer les erreurs
+          }
+        }
+      });
+      return finalCount;
+    };
+
+    // Attendre 3 secondes puis commencer à vérifier les quilles
+    const initialTimeout = setTimeout(() => {
+      let attempts = 0;
+      const maxAttempts = 30; // Maximum 3 secondes de vérification (30 * 100ms)
+
+      const checkPinsAndProceed = () => {
+        const fallenPins = countFallenPins();
+        attempts++;
+
+        // Si toutes les quilles sont tombées OU si on a atteint le maximum d'essais
+        if (fallenPins === 10 || attempts >= maxAttempts) {
+          const newRolls = [...rolls, fallenPins];
+
+          // Vérifier si c'est le 5ème lancer
+          if (newRolls.length >= 5) {
+            // Pour le 5ème lancer, enregistrer le score et terminer le jeu après un délai
+            setRolls(newRolls);
+            setBallLaunched(false);
+            // Attendre 2 secondes supplémentaires avant d'afficher la popup
+            setTimeout(() => {
+              setGameFinished(true);
+            }, 2000);
+          } else {
+            // Si ce n'est pas le 5ème lancer, continuer normalement
+            setRolls(newRolls);
+            setCurrentRoll((prev) => prev + 1);
+            setBallLaunched(false);
+
+            // Reset la boule et les quilles pour le prochain lancer
+            setTimeout(() => {
+              setResetSignal((s) => s + 1);
+            }, 100);
+          }
+        } else {
+          // Continuer à vérifier toutes les 100ms
+          setTimeout(checkPinsAndProceed, 100);
+        }
+      };
+
+      // Commencer la vérification
+      checkPinsAndProceed();
+    }, 3000); // Attendre 3 secondes initialement
+
+    return () => clearTimeout(initialTimeout);
+  }, [gameStarted, gameFinished, ballLaunched, rolls.length, currentRoll]);
 
   return (
     <div
@@ -687,7 +684,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
       {/* Bouton de retour */}
       <button
         onClick={handleBack}
-        className="absolute top-6 left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-3 py-2 sm:px-4 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base touch-manipulation"
         aria-label="Retour à l'accueil"
       >
         ← Back
@@ -711,26 +708,26 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                   <div className="flex items-start space-x-3 sm:space-x-4">
                     <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
                     <p className="text-white font-medium leading-relaxed">
-                      <span className="text-orange-300 font-bold">Appuyez</span>{" "}
-                      puis tirez vers le bas et relâchez pour lancer
+                      <span className="text-orange-300 font-bold">Press</span>{" "}
+                      then drag down and release to throw
                     </p>
                   </div>
                   <div className="flex items-start space-x-3 sm:space-x-4">
                     <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
                     <p className="text-white font-medium leading-relaxed">
                       <span className="text-orange-300 font-bold">
-                        Fais tomber toutes les quilles
+                        Knock down all the pins
                       </span>{" "}
-                      pour un strike !
+                      for a strike !
                     </p>
                   </div>
                   <div className="flex items-start space-x-3 sm:space-x-4">
                     <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
                     <p className="text-white font-medium leading-relaxed">
                       <span className="text-orange-300 font-bold">
-                        10 frames
+                        5 frames
                       </span>{" "}
-                      pour faire le meilleur score !
+                      to achieve the best score !
                     </p>
                   </div>
                 </div>
@@ -757,7 +754,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
       )}
 
       {/* Bowling Canvas */}
-      {gameStarted && !gameOver && (
+      {gameStarted && (
         <div className="w-full h-full">
           <Canvas
             camera={{ position: [0, 1.5, 2], fov: 60 }}
@@ -781,69 +778,143 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
               ballRef={ballRef}
               pinRefs={pinRefs}
               resetSignal={resetSignal}
+              ballLaunched={ballLaunched}
+              setBallLaunched={setBallLaunched}
+              gameFinished={gameFinished}
             />
           </Canvas>
 
+          {/* Affichage du jeu */}
+          <div className="absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-90 text-white p-3 sm:p-4 rounded-lg border border-orange-500 min-w-[280px] sm:min-w-[320px] max-w-[90vw]">
+            <div className="text-center">
+              <div className="text-base sm:text-lg font-bold text-orange-400 mb-2 sm:mb-3">
+                Frame {currentRoll} / 5
+              </div>
+
+              {/* Score par manche sans titre */}
+              {rolls.length > 0 && (
+                <div className="mb-2 sm:mb-3">
+                  <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
+                    {rolls.map((roll, index) => (
+                      <div
+                        key={index}
+                        className={`px-2 py-1 sm:px-3 rounded-full text-xs font-bold border ${
+                          roll === 10
+                            ? "bg-green-600 text-white border-green-500"
+                            : roll >= 7
+                            ? "bg-orange-600 text-white border-orange-500"
+                            : roll >= 4
+                            ? "bg-yellow-600 text-white border-yellow-500"
+                            : "bg-gray-600 text-white border-gray-500"
+                        }`}
+                      >
+                        <div className="text-xs opacity-75">F{index + 1}</div>
+                        <div className="text-xs sm:text-sm font-bold">
+                          {roll} pins
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Score total */}
+              {rolls.length > 0 && (
+                <div className="text-xs sm:text-sm text-orange-300 font-bold">
+                  Total: {rolls.reduce((sum, roll) => sum + roll, 0)} / 50 pins
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Bouton Reset */}
           <button
-            onClick={() => setResetSignal((s) => s + 1)}
-            className="absolute top-6 right-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
-            aria-label="Reset la boule et les quilles"
+            onClick={() => {
+              setResetSignal((s) => s + 1);
+              setCurrentRoll(1);
+              setRolls([]);
+              setGameFinished(false);
+              setBallLaunched(false);
+            }}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-3 py-2 sm:px-4 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base touch-manipulation"
+            aria-label="Reset ball and pins"
           >
             Reset
           </button>
 
-          {/* Bouton Score (Roll) */}
-          <button
-            onClick={handleRoll}
-            className="absolute top-20 right-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
-            aria-label="Valider le lancer et compter les quilles tombées"
-          >
-            Compter les quilles
-          </button>
-        </div>
-      )}
-
-      {/* Game Over */}
-      {gameOver && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2">
-          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-16 sm:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-xs sm:max-w-md mx-2">
-            {/* Effet holographique de fond */}
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
-            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
-            <div className="relative z-10 text-center">
-              <div className="mb-8">
-                <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 font-heading">
-                  Game Over!
-                </h2>
-                <div className="w-24 h-1 bg-orange-500 mx-auto mb-8"></div>
-              </div>
-              <div className="mb-8">
-                <div className="text-6xl font-bold text-orange-400 mb-4">
-                  {score}
+          {/* Popup de fin de jeu */}
+          {gameFinished && (
+            <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-4 sm:px-2">
+              <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-6 py-8 sm:px-16 sm:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-[95vw] sm:max-w-2xl mx-2 overflow-y-auto">
+                {/* Effet holographique de fond */}
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
+                <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
+                <div className="relative z-10">
+                  <div className="text-center space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 sm:mb-4">
+                      🎳 End Game
+                    </h2>
+                    <div className="text-base sm:text-lg text-orange-400 mb-3 sm:mb-4">
+                      Final Score: {rolls.reduce((sum, roll) => sum + roll, 0)}
+                      /50 pins
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4">
+                      <div className="text-xs text-gray-400 mb-2">
+                        Frame details :
+                      </div>
+                      <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
+                        {rolls.map((roll, index) => (
+                          <div
+                            key={index}
+                            className={`px-3 py-2 sm:px-4 rounded-full text-xs sm:text-sm font-bold border ${
+                              roll === 10
+                                ? "bg-green-600 text-white border-green-500"
+                                : roll >= 7
+                                ? "bg-orange-600 text-white border-orange-500"
+                                : roll >= 4
+                                ? "bg-yellow-600 text-white border-yellow-500"
+                                : "bg-gray-600 text-white border-gray-500"
+                            }`}
+                          >
+                            <div className="text-xs sm:text-sm opacity-75">
+                              F{index + 1}
+                            </div>
+                            <div className="text-sm sm:text-base font-bold">
+                              {roll} pins
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                    <button
+                      onClick={() => {
+                        setResetSignal((s) => s + 1);
+                        setCurrentRoll(1);
+                        setRolls([]);
+                        setGameFinished(false);
+                        setBallLaunched(false);
+                      }}
+                      className="bg-orange-500 text-white w-full sm:w-32 px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm sm:text-base touch-manipulation"
+                      aria-label="Play Again"
+                    >
+                      Play Again
+                    </button>
+                    <button
+                      onClick={handleBack}
+                      className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full sm:w-32 px-4 py-3 rounded-full font-bold shadow-lg text-sm sm:text-base touch-manipulation"
+                      aria-label="Retour à l'accueil"
+                    >
+                      ← Back
+                    </button>
+                  </div>
                 </div>
-                <div className="text-xl text-gray-300">Final Score</div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                <button
-                  onClick={handleStartGame}
-                  className="bg-orange-500 text-white w-full sm:w-auto px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base sm:text-lg"
-                  aria-label="Rejouer"
-                >
-                  Play Again
-                </button>
-                <button
-                  onClick={handleResetGame}
-                  className="bg-[#18181b] border border-orange-500 text-orange-400 w-full sm:w-auto px-4 py-3 rounded-full font-bold hover:bg-orange-500 hover:text-white transition-colors text-base sm:text-lg"
-                  aria-label="Retour au menu"
-                >
-                  Back to Menu
-                </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
