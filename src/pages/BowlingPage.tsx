@@ -870,28 +870,28 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
 
           {/* Popup de fin de jeu */}
           {gameFinished && (
-            <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-4 sm:px-2">
-              <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-6 py-8 sm:px-16 sm:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-[95vw] sm:max-w-2xl mx-2 overflow-y-auto">
+            <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2 sm:px-4 py-4 sm:py-8">
+              <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-8 sm:py-8 lg:px-16 lg:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-[95vw] sm:max-w-[90vw] lg:max-w-2xl mx-auto overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
                 {/* Effet holographique de fond */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
                 <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
                 <div className="relative z-10">
-                  <div className="text-center space-y-4 sm:space-y-6 mb-6 sm:mb-8">
-                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 sm:mb-4">
+                  <div className="text-center space-y-3 sm:space-y-4 lg:space-y-6 mb-4 sm:mb-6 lg:mb-8">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
                       Good job !
                     </h2>
-                    <div className="text-base sm:text-lg text-orange-400 mb-3 sm:mb-4">
+                    <div className="text-sm sm:text-base lg:text-lg text-orange-400 mb-2 sm:mb-3 lg:mb-4">
                       Final Score: {rolls.reduce((sum, roll) => sum + roll, 0)}
                       /50 pins
                     </div>
-                    <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4">
-                      <div className="flex flex-nowrap overflow-x-auto justify-center gap-2 sm:gap-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent">
+                    <div className="text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3 lg:mb-4">
+                      <div className="flex flex-nowrap overflow-x-auto justify-center gap-1 sm:gap-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent pb-1">
                         {rolls.map((roll, index) => (
                           <div
                             key={index}
-                            className={`px-3 py-2 sm:px-4 rounded-xl text-base sm:text-sm font-bold border min-w-[56px] sm:min-w-auto ${
+                            className={`px-2 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm lg:text-base font-bold border min-w-[48px] sm:min-w-[56px] lg:min-w-[64px] flex-shrink-0 ${
                               roll === 10
                                 ? "bg-green-600 text-white border-green-500"
                                 : roll >= 7
@@ -901,13 +901,13 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                                 : "bg-gray-600 text-white border-gray-500"
                             }`}
                           >
-                            <div className="text-xs sm:text-sm opacity-75">
+                            <div className="text-xs sm:text-xs lg:text-sm opacity-75">
                               F{index + 1}
                             </div>
-                            <div className="text-xl sm:text-base font-bold">
+                            <div className="text-sm sm:text-lg lg:text-xl font-bold">
                               {roll}
                             </div>
-                            <div className="text-xs sm:text-base font-bold opacity-75">
+                            <div className="text-xs sm:text-xs lg:text-sm font-bold opacity-75">
                               pins
                             </div>
                           </div>
@@ -915,7 +915,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3 sm:gap-4 justify-center w-full">
+                  <div className="flex flex-col gap-2 sm:gap-3 lg:gap-4 justify-center w-full">
                     <button
                       onClick={() => {
                         setResetSignal((s) => s + 1);
@@ -924,14 +924,14 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                         setGameFinished(false);
                         setBallLaunched(false);
                       }}
-                      className="bg-orange-500 text-white w-full px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm sm:text-base touch-manipulation"
+                      className="bg-orange-500 text-white w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-6 lg:py-4 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm sm:text-base lg:text-lg touch-manipulation"
                       aria-label="Play Again"
                     >
                       Play Again
                     </button>
                     <button
                       onClick={handleBack}
-                      className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-4 py-3 rounded-full font-bold shadow-lg text-sm sm:text-base touch-manipulation"
+                      className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-3 py-2.5 sm:px-4 sm:py-3 lg:px-6 lg:py-4 rounded-full font-bold shadow-lg text-sm sm:text-base lg:text-lg touch-manipulation"
                       aria-label="Retour à l'accueil"
                     >
                       ← Back
