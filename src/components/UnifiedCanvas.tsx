@@ -1301,6 +1301,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               >
                 <span className="font-bold">CMS</span>
               </button>
+              {/* Bouton Bowling temporairement caché
               <button
                 className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
                 style={{
@@ -1322,6 +1323,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               >
                 <span className="font-bold">Bowling</span>
               </button>
+              */}
             </div>
           </div>
         </div>
