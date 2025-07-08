@@ -684,7 +684,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
       {/* Bouton de retour */}
       <button
         onClick={handleBack}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-3 py-2 sm:px-4 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base touch-manipulation"
+        className="absolute top-2 left-2 sm:top-6 sm:left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-2 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-base touch-manipulation"
         aria-label="Retour à l'accueil"
       >
         ← Back
@@ -717,8 +717,8 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                     <p className="text-white font-medium leading-relaxed">
                       <span className="text-orange-300 font-bold">
                         Knock down all the pins
-                      </span>{" "}
-                      for a strike !
+                      </span>
+                      for a strike&nbsp;!
                     </p>
                   </div>
                   <div className="flex items-start space-x-3 sm:space-x-4">
@@ -785,7 +785,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
           </Canvas>
 
           {/* Affichage du jeu */}
-          <div className="absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-90 text-white p-3 sm:p-4 rounded-lg border border-orange-500 min-w-[280px] sm:min-w-[320px] max-w-[90vw]">
+          <div className="absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-90 text-white p-3 sm:p-4 rounded-lg border border-orange-500 min-w-[240px] sm:min-w-[320px] max-w-[85vw] sm:max-w-[90vw]">
             <div className="text-center">
               <div className="text-base sm:text-lg font-bold text-orange-400 mb-2 sm:mb-3">
                 Frame {currentRoll} / 5
@@ -798,7 +798,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                     {rolls.map((roll, index) => (
                       <div
                         key={index}
-                        className={`px-2 py-1 sm:px-3 rounded-full text-xs font-bold border ${
+                        className={`px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-bold border ${
                           roll === 10
                             ? "bg-green-600 text-white border-green-500"
                             : roll >= 7
@@ -836,7 +836,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
               setGameFinished(false);
               setBallLaunched(false);
             }}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-3 py-2 sm:px-4 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base touch-manipulation"
+            className="absolute top-2 right-2 sm:top-6 sm:right-6 z-50 bg-orange-500 text-white px-2 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-base touch-manipulation"
             aria-label="Reset ball and pins"
           >
             Reset
@@ -854,7 +854,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                 <div className="relative z-10">
                   <div className="text-center space-y-4 sm:space-y-6 mb-6 sm:mb-8">
                     <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 sm:mb-4">
-                      🎳 End Game
+                      End Game
                     </h2>
                     <div className="text-base sm:text-lg text-orange-400 mb-3 sm:mb-4">
                       Final Score: {rolls.reduce((sum, roll) => sum + roll, 0)}
