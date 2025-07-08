@@ -1205,7 +1205,7 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
               Passionate Creative Dev UI
             </h3>
             <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-body">
-              Hi ! I'm Jérémy NAPHAY, a french Creative Developer based in Lyon,
+              Hi ! I'm Jérémy NAPHAY, a French Creative Developer based in Lyon,
               France. I blend technology, design, and storytelling to craft
               bold, immersive web experiences that captivate users and drive
               engagement.
@@ -1300,6 +1300,27 @@ const UnifiedCanvas: React.FC<UnifiedCanvasProps> = ({
                 onClick={handleCmsClick}
               >
                 <span className="font-bold">CMS</span>
+              </button>
+              <button
+                className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-full shadow-lg border-2 transition-all duration-300 cursor-pointer text-sm sm:text-base md:text-lg font-bold"
+                style={{
+                  backgroundColor: "rgba(var(--color-grid-rgb), 0.1)",
+                  borderColor: "var(--color-grid)",
+                  color: "var(--color-grid)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.2)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(var(--color-grid-rgb), 0.1)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                onClick={() => (window.location.href = "/bowling")}
+              >
+                <span className="font-bold">Bowling</span>
               </button>
             </div>
           </div>

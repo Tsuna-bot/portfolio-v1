@@ -1,0 +1,853 @@
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import * as THREE from "three";
+import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
+
+interface BowlingPageProps {
+  onBack: () => void;
+}
+
+const PIN_POSITIONS: [number, number, number][] = [
+  [0, 0.4, 35],
+  [-0.3, 0.4, 35.5],
+  [0.3, 0.4, 35.5],
+  [-0.6, 0.4, 36],
+  [0, 0.4, 36],
+  [0.6, 0.4, 36],
+  [-0.9, 0.4, 36.5],
+  [-0.3, 0.4, 36.5],
+  [0.3, 0.4, 36.5],
+  [0.9, 0.4, 36.5],
+];
+const BALL_START: [number, number, number] = [0, 0.9, 5]; // y = 1.2 pour être encore plus haute avant le lancer
+
+// Profil harmonisé de quille de bowling avec courbes fluides
+const getPinProfile = () => [
+  // Base complète et harmonieuse
+  new THREE.Vector2(0.0, 0.0), // centre de la base
+  new THREE.Vector2(0.02, 0.0), // début de la base
+  new THREE.Vector2(0.04, 0.0), // base fine
+  new THREE.Vector2(0.06, 0.005), // base qui s'élargit
+  new THREE.Vector2(0.08, 0.01), // base qui s'élargit
+  new THREE.Vector2(0.1, 0.02), // base qui s'élargit
+  new THREE.Vector2(0.11, 0.03), // base large
+  new THREE.Vector2(0.12, 0.04), // transition vers le ventre
+  new THREE.Vector2(0.13, 0.05), // transition base/ventre
+  new THREE.Vector2(0.14, 0.07), // galbe montant harmonieux
+  new THREE.Vector2(0.15, 0.09), // galbe montant harmonieux
+  new THREE.Vector2(0.16, 0.12), // galbe montant harmonieux
+  new THREE.Vector2(0.17, 0.15), // galbe montant harmonieux
+  new THREE.Vector2(0.18, 0.18), // ventre commence à s'arrondir
+  new THREE.Vector2(0.185, 0.21), // ventre qui s'arrondit
+  new THREE.Vector2(0.19, 0.24), // ventre qui s'arrondit
+  new THREE.Vector2(0.195, 0.27), // VENTRE MAX (le plus large)
+  new THREE.Vector2(0.19, 0.3), // ventre arrondi
+  new THREE.Vector2(0.185, 0.33), // galbe descendant harmonieux
+  new THREE.Vector2(0.18, 0.36), // galbe descendant harmonieux
+  new THREE.Vector2(0.17, 0.39), // transition ventre/corps
+  new THREE.Vector2(0.16, 0.42), // corps harmonieux
+  new THREE.Vector2(0.15, 0.45), // corps harmonieux
+  new THREE.Vector2(0.14, 0.48), // corps harmonieux
+  new THREE.Vector2(0.13, 0.51), // corps harmonieux
+  new THREE.Vector2(0.12, 0.54), // corps harmonieux
+  new THREE.Vector2(0.11, 0.57), // corps harmonieux
+  new THREE.Vector2(0.1, 0.6), // début cou harmonieux
+  new THREE.Vector2(0.095, 0.63), // cou harmonieux
+  new THREE.Vector2(0.09, 0.66), // cou harmonieux
+  new THREE.Vector2(0.085, 0.69), // cou fin harmonieux
+  new THREE.Vector2(0.085, 0.72), // transition cou/tête harmonieuse
+  new THREE.Vector2(0.09, 0.75), // début tête harmonieux
+  new THREE.Vector2(0.1, 0.78), // tête qui s'élargit harmonieusement
+  new THREE.Vector2(0.11, 0.81), // tête qui s'élargit harmonieusement
+  new THREE.Vector2(0.12, 0.84), // tête qui s'élargit harmonieusement
+  new THREE.Vector2(0.125, 0.87), // ventre de la tête (large)
+  new THREE.Vector2(0.13, 0.9), // ventre de la tête (max)
+  new THREE.Vector2(0.128, 0.92), // ventre de la tête (max, arrondi)
+  new THREE.Vector2(0.125, 0.94), // début rétrécissement
+  new THREE.Vector2(0.12, 0.955), // rétrécissement
+  new THREE.Vector2(0.11, 0.97), // rétrécissement
+  new THREE.Vector2(0.09, 0.985), // rétrécissement
+  new THREE.Vector2(0.07, 0.993), // rétrécissement
+  new THREE.Vector2(0.045, 0.997), // rétrécissement
+  new THREE.Vector2(0.025, 0.999), // rétrécissement
+  new THREE.Vector2(0.012, 0.9997), // sommet très arrondi
+  new THREE.Vector2(0.005, 0.99995), // sommet très arrondi
+  new THREE.Vector2(0.0, 1.0), // sommet parfaitement arrondi
+];
+
+const BowlingPinMesh: React.FC<{
+  castShadow?: boolean;
+  receiveShadow?: boolean;
+}> = ({ castShadow = true, receiveShadow = true }) => {
+  const pinProfile = React.useMemo(getPinProfile, []);
+  return (
+    <mesh castShadow={castShadow} receiveShadow={receiveShadow}>
+      <latheGeometry args={[pinProfile, 64]} />
+      <meshStandardMaterial color="#fff" metalness={0.3} roughness={0.25} />
+    </mesh>
+  );
+};
+
+const BowlingPinPhysic = React.forwardRef<
+  React.ElementRef<typeof RigidBody>,
+  { position: [number, number, number]; pinIndex: number }
+>(({ position, pinIndex }, ref) => {
+  return (
+    <RigidBody
+      key={`pin-${pinIndex}`}
+      ref={ref}
+      restitution={0.4}
+      friction={0.3}
+      position={position}
+      canSleep={false}
+      linearDamping={0.3}
+      angularDamping={0.3}
+      mass={0.15}
+    >
+      {/* Base solide */}
+      <CuboidCollider args={[0.08, 0.05, 0.08]} position={[0, 0.025, 0]} />
+      {/* Corps creux - seulement les bords */}
+      <CuboidCollider args={[0.01, 0.4, 0.01]} position={[0, 0.25, 0]} />
+      <CuboidCollider args={[0.01, 0.4, 0.01]} position={[0.06, 0.25, 0]} />
+      <CuboidCollider args={[0.01, 0.4, 0.01]} position={[-0.06, 0.25, 0]} />
+      <CuboidCollider args={[0.01, 0.4, 0.01]} position={[0, 0.25, 0.06]} />
+      <CuboidCollider args={[0.01, 0.4, 0.01]} position={[0, 0.25, -0.06]} />
+      <BowlingPinMesh />
+    </RigidBody>
+  );
+});
+
+// Boule unifiée : une seule instance qui change de type selon l'état
+const BowlingBallPhysic = React.forwardRef<
+  React.ElementRef<typeof RigidBody>,
+  {
+    position: [number, number, number];
+    onPointerDown?: (e: React.PointerEvent) => void;
+    isLaunched: boolean;
+    launchVelocity?: [number, number, number];
+    launchAngularVelocity?: [number, number, number];
+  }
+>(
+  (
+    {
+      position,
+      onPointerDown,
+      isLaunched,
+      launchVelocity,
+      launchAngularVelocity,
+    },
+    ref
+  ) => {
+    // Appliquer la vélocité initiale via useEffect
+    React.useEffect(() => {
+      if (
+        isLaunched &&
+        ref &&
+        "current" in ref &&
+        ref.current &&
+        launchVelocity
+      ) {
+        try {
+          ref.current.setLinvel(
+            {
+              x: launchVelocity[0],
+              y: launchVelocity[1],
+              z: launchVelocity[2],
+            },
+            true
+          );
+        } catch (error) {
+          console.error(
+            "🎳 Erreur lors de l'application de la vélocité linéaire:",
+            error
+          );
+        }
+      }
+    }, [isLaunched, launchVelocity]);
+
+    React.useEffect(() => {
+      if (
+        isLaunched &&
+        ref &&
+        "current" in ref &&
+        ref.current &&
+        launchAngularVelocity
+      ) {
+        try {
+          ref.current.setAngvel(
+            {
+              x: launchAngularVelocity[0],
+              y: launchAngularVelocity[1],
+              z: launchAngularVelocity[2],
+            },
+            true
+          );
+        } catch (error) {
+          console.error(
+            "🎳 Erreur lors de l'application de la vélocité angulaire:",
+            error
+          );
+        }
+      }
+    }, [isLaunched, launchAngularVelocity]);
+
+    return (
+      <RigidBody
+        ref={ref}
+        colliders="ball"
+        restitution={0.01}
+        friction={0.005}
+        position={position}
+        canSleep={false}
+        linearDamping={0.005}
+        angularDamping={0.02}
+        type={isLaunched ? "dynamic" : "kinematicPosition"}
+        mass={100}
+        ccd={true}
+      >
+        <mesh castShadow receiveShadow onPointerDown={onPointerDown}>
+          <sphereGeometry args={[0.3, 32, 32]} />
+          <meshPhysicalMaterial
+            color="#ff7a1a"
+            emissive="#ff7a1a"
+            emissiveIntensity={0.7}
+            metalness={0.8}
+            roughness={0.1}
+            clearcoat={1}
+            clearcoatRoughness={0.05}
+            envMapIntensity={1.5}
+          />
+        </mesh>
+      </RigidBody>
+    );
+  }
+);
+
+const BowlingLane: React.FC = () => (
+  <group>
+    <mesh
+      position={[0, -0.1, 15]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      receiveShadow
+    >
+      <planeGeometry args={[4, 30]} />
+      <meshStandardMaterial color="#18181b" />
+    </mesh>
+    <mesh
+      position={[-2.5, 0, 15]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      receiveShadow
+    >
+      <planeGeometry args={[0.5, 30]} />
+      <meshStandardMaterial color="#18181b" />
+    </mesh>
+    <mesh position={[2.5, 0, 15]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <planeGeometry args={[0.5, 30]} />
+      <meshStandardMaterial color="#18181b" />
+    </mesh>
+    {[5, 10, 15, 20, 25].map((z) => (
+      <mesh key={z} position={[0, 0.01, z]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.1, 0.1]} />
+        <meshStandardMaterial color="#ff7a1a" />
+      </mesh>
+    ))}
+  </group>
+);
+
+// Composant AimCurve - courbe simple qui montre où la boule va atterrir
+const AimCurve = ({ angle, power }: { angle: number; power: number }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  // Courbe basée sur la vraie physique de la boule
+  const start = new THREE.Vector3().set(0, 1.1, 5); // Au-dessus de la boule
+
+  // Calcul basé sur la vélocité réelle de la boule
+  const speed = 1.5 * power * 6; // Même vitesse que la boule
+  const vx = Math.sin(angle) * speed;
+  const vz = Math.cos(angle) * speed;
+  const vy = (power - 1) * 2; // Même vélocité verticale que la boule
+
+  // Point intermédiaire (après 0.2 secondes)
+  const t1 = 0.2;
+  const midX = vx * t1;
+  const midY = 1.1 + vy * t1 - 0.5 * 9.81 * t1 * t1; // Physique avec gravité
+  const midZ = 5 + vz * t1;
+  const mid = new THREE.Vector3().set(midX, midY, midZ);
+
+  // Point final (après 0.4 secondes)
+  const t2 = 0.4;
+  const endX = vx * t2;
+  const endY = 1.1 + vy * t2 - 0.5 * 9.81 * t2 * t2; // Physique avec gravité
+  const endZ = 5 + vz * t2;
+  const end = new THREE.Vector3().set(endX, endY, endZ);
+
+  // Courbe simple avec 3 points
+  const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+  useFrame(({ clock }) => {
+    if (meshRef.current && meshRef.current.material) {
+      const mat = meshRef.current.material as THREE.MeshPhysicalMaterial;
+      if ("emissiveIntensity" in mat) {
+        mat.emissiveIntensity =
+          1.5 + Math.sin(clock.getElapsedTime() * 3) * 0.6;
+      }
+    }
+  });
+  return (
+    <mesh ref={meshRef}>
+      <tubeGeometry args={[curve, 64, 0.015, 8, false]} />
+      <meshPhysicalMaterial
+        color="#ff6b00"
+        emissive="#ff6b00"
+        opacity={0.7}
+        transparent
+        transmission={0.9}
+        ior={1.3}
+        metalness={1}
+        roughness={0.05}
+        clearcoat={1}
+        clearcoatRoughness={0.02}
+        thickness={0.3}
+        emissiveIntensity={1.5}
+      />
+    </mesh>
+  );
+};
+
+const BowlingScene: React.FC<{
+  ballRef: React.RefObject<React.ElementRef<typeof RigidBody> | null>;
+  pinRefs: React.RefObject<React.ElementRef<typeof RigidBody> | null>[];
+  resetSignal: number;
+}> = ({ ballRef, pinRefs, resetSignal }) => {
+  const { camera } = useThree();
+  const [isAiming, setIsAiming] = useState(false);
+  const [aimAngle, setAimAngle] = useState(0);
+  const [pendingPower, setPendingPower] = useState(1);
+  const [finalPower, setFinalPower] = useState(1);
+  const [startX, setStartX] = useState<number | null>(null);
+  const [startY, setStartY] = useState<number | null>(null);
+  const [ballLaunched, setBallLaunched] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  // Fonction sécurisée pour réinitialiser la boule
+  const resetBallSafely = useCallback(() => {
+    if (ballRef.current && !isResetting) {
+      try {
+        console.log("🎳 Remise de la boule en position de départ");
+        setIsResetting(true);
+
+        // Vérifier que le contexte WebGL est toujours valide
+        if (ballRef.current) {
+          // Mettre la boule en mode kinematic et la replacer
+          ballRef.current.setBodyType(1, true); // 1 = Kinematic
+          ballRef.current.setTranslation(
+            { x: BALL_START[0], y: BALL_START[1], z: BALL_START[2] },
+            true
+          );
+          ballRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+          ballRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
+
+          console.log("🎳 Boule remise en mode kinematic");
+
+          // Réinitialiser l'état
+          setBallLaunched(false);
+        }
+
+        // Délai pour s'assurer que le reset est terminé
+        setTimeout(() => setIsResetting(false), 200);
+      } catch (error) {
+        console.error(
+          "🎳 Erreur lors de la réinitialisation de la boule:",
+          error
+        );
+        setIsResetting(false);
+      }
+    } else {
+      console.log("🎳 ballRef.current est null ou reset en cours");
+    }
+  }, [ballRef]);
+
+  // Fonction sécurisée pour réinitialiser les quilles
+  const resetPinsSafely = useCallback(() => {
+    pinRefs.forEach((ref, i) => {
+      if (ref.current && PIN_POSITIONS[i]) {
+        try {
+          const pos = PIN_POSITIONS[i];
+          ref.current.setTranslation({ x: pos[0], y: pos[1], z: pos[2] }, true);
+          ref.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+          ref.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
+          ref.current.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
+        } catch (error) {
+          console.error(
+            `🎳 Erreur lors de la réinitialisation de la quille ${i}:`,
+            error
+          );
+        }
+      }
+    });
+  }, [pinRefs]);
+
+  // Reset la boule et les quilles quand resetSignal change
+  useEffect(() => {
+    if (resetSignal === 0) return; // Éviter le reset initial
+
+    console.log("🎳 Reset de la boule - signal:", resetSignal);
+
+    // Utiliser setTimeout pour s'assurer que les composants sont montés
+    const timer = setTimeout(() => {
+      if (!isResetting) {
+        // Éviter les resets multiples
+        resetBallSafely();
+        resetPinsSafely();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [resetSignal]); // Supprimer les dépendances qui causent la boucle
+
+  // Caméra qui se rapproche des quilles au lancer
+  useFrame(() => {
+    try {
+      let target, lookAt;
+
+      if (ballLaunched) {
+        // Vue très rapprochée des quilles quand la boule est lancée
+        target = new THREE.Vector3(0, 1.5, 25);
+        lookAt = new THREE.Vector3(0, 0.4, 36);
+      } else {
+        // Vue d'ensemble quand la boule n'est pas lancée
+        target = new THREE.Vector3(0, 2.5, 0);
+        lookAt = new THREE.Vector3(0, 0.4, 36);
+      }
+
+      // Transition différente selon la direction
+      const lerpSpeed = ballLaunched ? 0.01 : 0.05; // Plus rapide pour le retour
+      camera.position.lerp(target, lerpSpeed);
+      camera.lookAt(lookAt);
+    } catch (error) {
+      console.error("🎳 Erreur générale dans useFrame:", error);
+    }
+  });
+
+  // Pull down and release pour lancer la boule
+  useEffect(() => {
+    if (!isAiming || isResetting) return;
+
+    const handleMove = (e: PointerEvent) => {
+      if (startX === null || startY === null) return;
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY; // Plus on descend, plus la puissance augmente
+      let angle = (deltaX / 200) * (Math.PI / 6);
+      angle = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, angle));
+      setAimAngle(angle);
+      // Affichage de la puissance en temps réel (feedback visuel)
+      let pow = 1 + deltaY / 150;
+      pow = Math.max(0.5, Math.min(3.0, pow));
+      setPendingPower(pow);
+    };
+
+    const handleUp = (e: PointerEvent) => {
+      if (startX === null || startY === null || isResetting) return;
+
+      // Calculer la puissance finale uniquement ici
+      const deltaY = e.clientY - startY;
+      let pow = 1 + deltaY / 150;
+      pow = Math.max(0.5, Math.min(3.0, pow));
+      setFinalPower(pow);
+      setBallLaunched(true);
+      setIsAiming(false);
+      setStartX(null);
+      setStartY(null);
+      setPendingPower(1);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+  }, [isAiming, startX, startY, isResetting]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    console.log("🎳 handlePointerDown appelé");
+    if (isAiming || isResetting) {
+      console.log("🎳 Déjà en train de viser ou reset en cours, ignoré");
+      return;
+    }
+    console.log("🎳 Début du lancer - boule en mode kinematic");
+    setIsAiming(true);
+    setStartX(e.clientX);
+    setStartY(e.clientY);
+    setPendingPower(1);
+  };
+
+  // Calculer les vélocités de lancement basées sur la courbe de visée
+  const launchVelocity: [number, number, number] | undefined = ballLaunched
+    ? [
+        Math.sin(aimAngle) * 1.2 * finalPower * 8, // Vitesse réaliste
+        (finalPower - 1) * 2, // Vélocité verticale inchangée pour garder la trajectoire
+        Math.cos(aimAngle) * 1.2 * finalPower * 8, // Vitesse réaliste
+      ]
+    : undefined;
+
+  const launchAngularVelocity: [number, number, number] | undefined =
+    ballLaunched
+      ? [
+          Math.sin(aimAngle) * 0.2 * finalPower, // Très faible pour un tir droit
+          0,
+          Math.cos(aimAngle) * 0.2 * finalPower, // Très faible pour un tir droit
+        ]
+      : undefined;
+
+  return (
+    <Physics gravity={[0, -9.81, 0]} debug={false}>
+      {/* Éclairage */}
+      <ambientLight intensity={0.6} />
+      <directionalLight
+        position={[10, 10, 5]}
+        intensity={1}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+      />
+      <pointLight position={[0, 10, 0]} intensity={0.8} />
+
+      {/* Sol */}
+      <RigidBody type="fixed">
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0, 20]}
+          receiveShadow
+        >
+          <planeGeometry args={[50, 50]} />
+          <meshStandardMaterial color="#18181b" />
+        </mesh>
+      </RigidBody>
+
+      {/* Grille */}
+      <gridHelper
+        args={[50, 40, "#ff7a1a", "#ff7a1a"]}
+        position={[0, 0.01, 20]}
+      />
+
+      {/* Piste de bowling */}
+      <BowlingLane />
+
+      {/* Quilles physiques */}
+      {PIN_POSITIONS.map((pos, i) => (
+        <BowlingPinPhysic
+          key={`pin-${i}`}
+          ref={pinRefs[i]}
+          position={pos}
+          pinIndex={i}
+        />
+      ))}
+
+      {/* Boule unifiée - une seule instance qui change de type */}
+      <BowlingBallPhysic
+        ref={ballRef}
+        position={BALL_START}
+        onPointerDown={handlePointerDown}
+        isLaunched={ballLaunched}
+        launchVelocity={launchVelocity}
+        launchAngularVelocity={launchAngularVelocity}
+      />
+
+      {/* Aide à la visée type CubeGame : courbe physique */}
+      {isAiming && !ballLaunched && (
+        <AimCurve angle={aimAngle} power={pendingPower} />
+      )}
+    </Physics>
+  );
+};
+
+const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
+  const navigate = useNavigate();
+  const ballRef = useRef<React.ElementRef<typeof RigidBody>>(null);
+  const pinRefs = [
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+    useRef<React.ElementRef<typeof RigidBody>>(null),
+  ];
+  const [gameStarted, setGameStarted] = useState(false);
+  const [currentFrame, setCurrentFrame] = useState(1);
+  const [currentRoll, setCurrentRoll] = useState(1);
+  const [score, setScore] = useState(0);
+  const [frames, setFrames] = useState<number[][]>([]);
+  const [gameOver, setGameOver] = useState(false);
+  const [resetSignal, setResetSignal] = useState(0);
+
+  // Score = nombre de quilles couchées (angle d'inclinaison > 0.5 radian)
+  const getKnockedPins = () => {
+    let count = 0;
+    pinRefs.forEach((ref, index) => {
+      if (ref.current) {
+        try {
+          const rot = ref.current.rotation();
+          // Si la quille est inclinée de plus de 0.5 radian sur X ou Z
+          if (Math.abs(rot.x) > 0.5 || Math.abs(rot.z) > 0.5) {
+            count++;
+          }
+        } catch (error) {
+          console.error(
+            `🎳 Erreur lors de la vérification de la quille ${index}:`,
+            error
+          );
+        }
+      }
+    });
+    return count;
+  };
+
+  const handleBack = () => {
+    navigate("/");
+    onBack();
+  };
+
+  const handleStartGame = () => {
+    setGameStarted(true);
+    setCurrentFrame(1);
+    setCurrentRoll(1);
+    setScore(0);
+    setFrames([]);
+    setGameOver(false);
+    setResetSignal((s) => s + 1);
+  };
+
+  const handleResetGame = () => {
+    setGameStarted(false);
+    setCurrentFrame(1);
+    setCurrentRoll(1);
+    setScore(0);
+    setFrames([]);
+    setGameOver(false);
+    setResetSignal((s) => s + 1);
+  };
+
+  const handleRoll = () => {
+    // Score = nombre de quilles tombées
+    const pinsHit = getKnockedPins();
+    const newFrames = [...frames];
+    if (currentRoll === 1) {
+      newFrames.push([pinsHit]);
+    } else {
+      const currentFrameData = newFrames[currentFrame - 1];
+      if (currentFrameData) {
+        currentFrameData.push(pinsHit);
+      }
+    }
+    setFrames(newFrames);
+    setScore(score + pinsHit);
+    if (currentRoll === 1 && pinsHit === 10) {
+      setCurrentFrame(currentFrame + 1);
+      setCurrentRoll(1);
+    } else if (currentRoll === 2) {
+      setCurrentFrame(currentFrame + 1);
+      setCurrentRoll(1);
+    } else {
+      setCurrentRoll(2);
+    }
+    if (currentFrame >= 10) {
+      setGameOver(true);
+    }
+    // Reset la boule pour le prochain lancer - avec gestion d'erreur sécurisée
+    if (ballRef.current) {
+      try {
+        ballRef.current.setTranslation(
+          { x: BALL_START[0], y: BALL_START[1], z: BALL_START[2] },
+          true
+        );
+        ballRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+        ballRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      } catch (error) {
+        console.error(
+          "🎳 Erreur lors du reset de la boule dans handleRoll:",
+          error
+        );
+        // Forcer un reset complet si la boule est dans un état incohérent
+        setResetSignal((s) => s + 1);
+      }
+    }
+  };
+
+  return (
+    <div
+      className="w-full min-h-screen relative touch-none"
+      style={{ touchAction: "none" }}
+    >
+      {/* Bouton de retour */}
+      <button
+        onClick={handleBack}
+        className="absolute top-6 left-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+        aria-label="Retour à l'accueil"
+      >
+        ← Back
+      </button>
+
+      {/* Écran d'accueil avec instructions */}
+      {!gameStarted && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2">
+          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-16 sm:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-xs sm:max-w-2xl mx-2 overflow-y-auto">
+            {/* Effet holographique de fond */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="relative z-10">
+              <div className="text-left space-y-6 mb-8 sm:mb-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 text-center">
+                  How to play:
+                </h2>
+                <div className="space-y-4 sm:space-y-5 text-base sm:text-lg">
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">Appuyez</span>{" "}
+                      puis tirez vers le bas et relâchez pour lancer
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">
+                        Fais tomber toutes les quilles
+                      </span>{" "}
+                      pour un strike !
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3 sm:space-x-4">
+                    <div className="flex-shrink-0 w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-orange-500 border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent mt-2"></div>
+                    <p className="text-white font-medium leading-relaxed">
+                      <span className="text-orange-300 font-bold">
+                        10 frames
+                      </span>{" "}
+                      pour faire le meilleur score !
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <button
+                  onClick={handleStartGame}
+                  className="bg-orange-500 text-white w-full sm:w-32 px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base sm:text-lg"
+                  aria-label="Démarrer le jeu"
+                >
+                  Start
+                </button>
+                <button
+                  onClick={handleBack}
+                  className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full sm:w-32 px-4 py-3 rounded-full font-bold shadow-lg text-base sm:text-lg"
+                  aria-label="Retour à l'accueil"
+                >
+                  ← Back
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bowling Canvas */}
+      {gameStarted && !gameOver && (
+        <div className="w-full h-full">
+          <Canvas
+            camera={{ position: [0, 1.5, 2], fov: 60 }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              background: "transparent",
+              zIndex: 10,
+              touchAction: "none",
+            }}
+            shadows
+            onCreated={({ gl }) => {
+              gl.setClearColor(0x000000, 0);
+              gl.autoClear = false;
+            }}
+          >
+            <BowlingScene
+              ballRef={ballRef}
+              pinRefs={pinRefs}
+              resetSignal={resetSignal}
+            />
+          </Canvas>
+
+          {/* Bouton Reset */}
+          <button
+            onClick={() => setResetSignal((s) => s + 1)}
+            className="absolute top-6 right-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+            aria-label="Reset la boule et les quilles"
+          >
+            Reset
+          </button>
+
+          {/* Bouton Score (Roll) */}
+          <button
+            onClick={handleRoll}
+            className="absolute top-20 right-6 z-50 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-2 rounded-full font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-base sm:text-lg"
+            aria-label="Valider le lancer et compter les quilles tombées"
+          >
+            Compter les quilles
+          </button>
+        </div>
+      )}
+
+      {/* Game Over */}
+      {gameOver && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2">
+          <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-16 sm:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-xs sm:max-w-md mx-2">
+            {/* Effet holographique de fond */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255, 166, 0, 0.2),transparent_50%)] rounded-xl pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse pointer-events-none"></div>
+            <div className="relative z-10 text-center">
+              <div className="mb-8">
+                <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 font-heading">
+                  Game Over!
+                </h2>
+                <div className="w-24 h-1 bg-orange-500 mx-auto mb-8"></div>
+              </div>
+              <div className="mb-8">
+                <div className="text-6xl font-bold text-orange-400 mb-4">
+                  {score}
+                </div>
+                <div className="text-xl text-gray-300">Final Score</div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <button
+                  onClick={handleStartGame}
+                  className="bg-orange-500 text-white w-full sm:w-auto px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base sm:text-lg"
+                  aria-label="Rejouer"
+                >
+                  Play Again
+                </button>
+                <button
+                  onClick={handleResetGame}
+                  className="bg-[#18181b] border border-orange-500 text-orange-400 w-full sm:w-auto px-4 py-3 rounded-full font-bold hover:bg-orange-500 hover:text-white transition-colors text-base sm:text-lg"
+                  aria-label="Retour au menu"
+                >
+                  Back to Menu
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BowlingPage;

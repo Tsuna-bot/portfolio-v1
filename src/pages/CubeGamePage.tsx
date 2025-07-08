@@ -265,7 +265,7 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
   };
 
   return (
-    <Physics gravity={[0, -9.81, 0]}>
+    <Physics gravity={[0, -9.81, 0]} debug={false}>
       {/* Sol */}
       <RigidBody type="fixed">
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 20]}>

@@ -11,6 +11,7 @@ import UnifiedCanvas from "./components/UnifiedCanvas";
 // import WorklyPage from "./pages/WorklyPage";
 // import TrekksPage from "./pages/TrekksPage";
 import CubeGamePage from "./pages/CubeGamePage";
+import BowlingPage from "./pages/BowlingPage";
 import { LenisProvider } from "./components/LenisProvider";
 import LoadingPage from "./components/LoadingPage";
 import { usePreloader } from "./hooks/usePreloader";
@@ -122,6 +123,10 @@ const AppContent: React.FC = () => {
             }
           /> */}
           <Route path="/cube-game" element={<CubeGamePage />} />
+          <Route
+            path="/bowling"
+            element={<BowlingPage onBack={() => navigate("/")} />}
+          />
 
           {/* Redirection par défaut */}
           <Route path="*" element={<Navigate to="/" replace />} />
