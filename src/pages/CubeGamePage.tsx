@@ -225,8 +225,14 @@ const Scene = ({ onTargetHit }: { onTargetHit: () => void }) => {
       2 * Math.tan(fov / 2) * (z - perspectiveCamera.position.z);
     const visibleWidth = visibleHeight * aspect;
     const margin = 1.2; // marge pour ne pas coller au bord
-    const minX = -visibleWidth / 2 + margin;
-    const maxX = visibleWidth / 2 - margin;
+    // Réduction du champ horizontal à la moitié centrale (desktop uniquement)
+    const isMobile = window.innerWidth < 640; // sm breakpoint
+    const minX = isMobile
+      ? -visibleWidth / 2 + margin
+      : -visibleWidth / 4 + margin;
+    const maxX = isMobile
+      ? visibleWidth / 2 - margin
+      : visibleWidth / 4 - margin;
 
     do {
       const newX = Math.random() * (maxX - minX) + minX;
@@ -661,7 +667,7 @@ const CubeGame = () => {
       )}
 
       {/* Grille pour l'interface mobile */}
-      {gameStarted && (
+      {gameStarted && !showFinalScore && (
         <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-40 sm:hidden">
           {/* Menu burger - colonne de gauche */}
           <div className="absolute top-0 left-0 w-20 h-full">
@@ -683,65 +689,30 @@ const CubeGame = () => {
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
 
               <div className="relative flex flex-col gap-3 items-center justify-center">
-                {!showFinalScore ? (
-                  <>
-                    <div className="flex gap-8 items-center">
-                      <div className="text-center">
-                        <div
-                          className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                          style={{ fontFamily: "Shutteblock, monospace" }}
-                        >
-                          {timeLeft}s
-                        </div>
-                        <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                          TIME
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div
-                          className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                          style={{ fontFamily: "Shutteblock, monospace" }}
-                        >
-                          {score}
-                        </div>
-                        <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                          TARGETS
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
+                <div className="flex gap-8 items-center">
                   <div className="text-center">
                     <div
-                      className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
+                      className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
                       style={{ fontFamily: "Shutteblock, monospace" }}
                     >
-                      Good job!
+                      {timeLeft}s
                     </div>
-                    <div
-                      className="text-lg font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                      style={{ fontFamily: "Shutteblock, monospace" }}
-                    >
-                      {score} targets in 30s
-                    </div>
-                    <div className="flex flex-col gap-3 justify-center w-full mt-4">
-                      <button
-                        onClick={handleReset}
-                        className="bg-orange-500 text-white w-full px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm touch-manipulation"
-                        aria-label="Play Again"
-                      >
-                        Play Again
-                      </button>
-                      <button
-                        onClick={() => (window.location.href = "/")}
-                        className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-4 py-3 rounded-full font-bold shadow-lg text-sm touch-manipulation"
-                        aria-label="Retour à l'accueil"
-                      >
-                        ← Back
-                      </button>
+                    <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                      TIME
                     </div>
                   </div>
-                )}
+                  <div className="text-center">
+                    <div
+                      className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                      style={{ fontFamily: "Shutteblock, monospace" }}
+                    >
+                      {score}
+                    </div>
+                    <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                      TARGETS
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -834,7 +805,7 @@ const CubeGame = () => {
       )}
 
       {showFinalScore && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2 sm:px-4 py-4 sm:py-8">
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-2 sm:px-4 py-4 sm:py-8 sm:hidden">
           <div className="relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-6 sm:px-8 sm:py-8 lg:px-16 lg:py-10 rounded-xl shadow-2xl backdrop-blur-sm w-full max-w-[95vw] sm:max-w-[90vw] lg:max-w-2xl mx-auto overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
             {/* Effet holographique de fond */}
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse pointer-events-none"></div>

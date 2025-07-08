@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
 import BurgerMenu from "../components/BurgerMenu";
+import LoadingPage from "../components/LoadingPage";
 
 interface BowlingPageProps {
   onBack: () => void;
@@ -580,10 +581,14 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
   const [rolls, setRolls] = useState<number[]>([]);
   const [gameFinished, setGameFinished] = useState(false);
   const [ballLaunched, setBallLaunched] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const handleBack = () => {
-    navigate("/");
-    onBack();
+    setShowLoading(true);
+    setTimeout(() => {
+      navigate("/");
+      onBack();
+    }, 1000);
   };
 
   const handleStartGame = () => {
@@ -682,6 +687,11 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
       className="w-full min-h-screen relative touch-none"
       style={{ touchAction: "none" }}
     >
+      {showLoading && (
+        <div className="fixed inset-0 z-[999]">
+          <LoadingPage onLoadingComplete={() => {}} />
+        </div>
+      )}
       {/* Bouton de retour (desktop uniquement) */}
       <button
         onClick={handleBack}

@@ -42,7 +42,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({
         >
           {/* Menu réel, stoppe la propagation du clic */}
           <div
-            className="absolute top-16 left-4 z-60 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-3 rounded-xl shadow-2xl backdrop-blur-sm min-w-[200px] pointer-events-auto"
+            className="absolute top-20 left-4 z-60 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400 text-white px-4 py-3 rounded-xl shadow-2xl backdrop-blur-sm min-w-[200px] pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Effet holographique de fond */}
