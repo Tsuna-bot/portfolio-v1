@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
+import BurgerMenu from "../components/BurgerMenu";
 
 interface BowlingPageProps {
   onBack: () => void;
@@ -784,8 +785,73 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
             />
           </Canvas>
 
-          {/* Affichage du jeu */}
-          <div className="absolute top-4 sm:top-6 left-0 right-0 mx-auto z-50 bg-black bg-opacity-90 text-white p-2 sm:p-4 rounded-xl border border-orange-500 w-[96vw] max-w-[420px] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:w-auto sm:max-w-[90vw] py-2 sm:py-0">
+          {/* Grille pour l'interface mobile */}
+          <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-40 sm:hidden">
+            {/* Menu burger - colonne de gauche */}
+            <div className="absolute top-0 left-0 w-20 h-full">
+              <div className="absolute top-4 left-4 pointer-events-auto">
+                <BurgerMenu
+                  onBack={handleBack}
+                  onReset={() => {
+                    setResetSignal((s) => s + 1);
+                    setCurrentRoll(1);
+                    setRolls([]);
+                    setGameFinished(false);
+                    setBallLaunched(false);
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Scoreboard - colonne de droite (plus d'espace) */}
+            <div className="absolute top-0 right-0 w-[calc(100%-5rem)] h-full">
+              <div className="absolute top-4 right-4 left-4 bg-black bg-opacity-90 text-white p-3 rounded-xl border border-orange-500">
+                <div className="text-center">
+                  <div className="text-base sm:text-lg font-bold text-orange-400 mb-3">
+                    Frame {currentRoll} / 5
+                  </div>
+
+                  {/* Score par manche avec plus d'espace */}
+                  {rolls.length > 0 && (
+                    <div className="mb-3 h-24">
+                      <div className="flex flex-nowrap overflow-x-auto w-full gap-2 justify-center h-full scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent">
+                        {rolls.map((roll, index) => (
+                          <div
+                            key={index}
+                            className={`flex flex-col items-center justify-center h-full px-2 rounded-xl text-xl font-bold border min-w-[72px] text-center leading-tight ${
+                              roll === 10
+                                ? "bg-green-600 text-white border-green-500"
+                                : roll >= 7
+                                ? "bg-orange-600 text-white border-orange-500"
+                                : roll >= 4
+                                ? "bg-yellow-600 text-white border-yellow-500"
+                                : "bg-gray-600 text-white border-gray-500"
+                            }`}
+                          >
+                            <div className="text-base opacity-70 mb-1">
+                              F{index + 1}
+                            </div>
+                            <div className="text-2xl font-bold">{roll}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Score total avec plus d'espace */}
+                  {rolls.length > 0 && (
+                    <div className="py-3 px-2 text-2xl text-orange-300 font-extrabold w-full">
+                      Total : {rolls.reduce((sum, roll) => sum + roll, 0)} / 50
+                      pins
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Affichage du jeu (desktop uniquement) */}
+          <div className="absolute top-4 sm:top-6 left-0 right-0 mx-auto z-40 bg-black bg-opacity-90 text-white p-2 sm:p-4 rounded-xl border border-orange-500 w-[96vw] max-w-[420px] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:w-auto sm:max-w-[90vw] py-2 sm:py-0 hidden sm:block">
             <div className="text-center">
               <div className="text-base sm:text-lg font-bold text-orange-400 mb-2 sm:mb-3">
                 Frame {currentRoll} / 5
@@ -838,35 +904,11 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
               setGameFinished(false);
               setBallLaunched(false);
             }}
-            className="absolute top-2 right-2 sm:top-6 sm:right-6 z-50 bg-orange-500 text-white px-2 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-base touch-manipulation hidden sm:block"
+            className="absolute top-2 right-2 sm:top-6 sm:right-6 z-40 bg-orange-500 text-white px-2 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-base touch-manipulation hidden sm:block"
             aria-label="Reset ball and pins"
           >
             Reset
           </button>
-
-          {/* Boutons Back & Reset fixes en bas sur mobile */}
-          <div className="fixed bottom-0 left-0 w-full flex justify-between px-4 pb-4 z-50 sm:hidden">
-            <button
-              onClick={handleBack}
-              className="w-1/3 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-3 rounded-full font-bold shadow-lg text-base touch-manipulation"
-              aria-label="Retour à l'accueil"
-            >
-              ← Back
-            </button>
-            <button
-              onClick={() => {
-                setResetSignal((s) => s + 1);
-                setCurrentRoll(1);
-                setRolls([]);
-                setGameFinished(false);
-                setBallLaunched(false);
-              }}
-              className="w-1/3 bg-orange-500 text-white hover:bg-orange-600 transition-colors border border-orange-500 px-4 py-3 rounded-full font-bold shadow-lg text-base touch-manipulation"
-              aria-label="Reset ball and pins"
-            >
-              Reset
-            </button>
-          </div>
 
           {/* Popup de fin de jeu */}
           {gameFinished && (

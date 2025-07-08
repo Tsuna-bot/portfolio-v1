@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import type { Mesh } from "three";
 import { Physics, RigidBody } from "@react-three/rapier";
+import BurgerMenu from "../components/BurgerMenu";
 
 const HOLO_COL = "#ffef36";
 
@@ -541,23 +542,11 @@ const CubeGame = () => {
       className="w-full min-h-screen relative touch-none"
       style={{ touchAction: "none" }}
     >
-      {/* Boutons Back & Reset fixes en bas sur mobile */}
-      <div className="fixed bottom-0 left-0 w-full flex justify-between px-4 pb-4 z-50 sm:hidden">
-        <button
-          onClick={() => (window.location.href = "/")}
-          className="w-1/3 border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors px-4 py-3 rounded-full font-bold shadow-lg text-base touch-manipulation"
-          aria-label="Retour à l'accueil"
-        >
-          ← Back
-        </button>
-        <button
-          onClick={handleReset}
-          className="w-1/3 bg-orange-500 text-white hover:bg-orange-600 transition-colors border border-orange-500 px-4 py-3 rounded-full font-bold shadow-lg text-base touch-manipulation"
-          aria-label="Reset"
-        >
-          Reset
-        </button>
-      </div>
+      {/* Menu burger pour mobile */}
+      <BurgerMenu
+        onBack={() => (window.location.href = "/")}
+        onReset={handleReset}
+      />
 
       {/* Bouton de retour (desktop uniquement) */}
       <button
@@ -669,68 +658,35 @@ const CubeGame = () => {
         </button>
       )}
 
-      {/* Scoreboard: always visible during game, animates position/zoom, content changes */}
+      {/* Grille pour l'interface mobile */}
       {gameStarted && (
-        <>
-          {/* Version mobile : deux blocs séparés uniquement si !showFinalScore */}
-          {!showFinalScore && (
-            <div className="block sm:hidden pb-24">
-              <div className="absolute top-24 left-4 z-50">
-                <div className="bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 rounded-xl shadow-2xl backdrop-blur-sm w-auto text-center">
-                  <div
-                    className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                    style={{ fontFamily: "Shutteblock, monospace" }}
-                  >
-                    {timeLeft}s
-                  </div>
-                  <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                    TIME
-                  </div>
-                </div>
-              </div>
-              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-                <div className="bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-4 py-2 rounded-xl shadow-2xl backdrop-blur-sm w-auto text-center">
-                  <div
-                    className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
-                    style={{ fontFamily: "Shutteblock, monospace" }}
-                  >
-                    {score}
-                  </div>
-                  <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
-                    TARGETS
-                  </div>
-                </div>
-              </div>
+        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-40 sm:hidden">
+          {/* Menu burger - colonne de gauche */}
+          <div className="absolute top-0 left-0 w-20 h-full">
+            <div className="absolute top-4 left-4 pointer-events-auto">
+              <BurgerMenu
+                onBack={() => (window.location.href = "/")}
+                onReset={handleReset}
+              />
             </div>
-          )}
-          {/* Version desktop ou bloc final : bloc groupé centré */}
-          <div
-            className={`z-50 transition-all duration-1000 px-2 ${
-              showFinalScore ? "" : "hidden sm:block"
-            } ${
-              showFinalScore
-                ? "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-110"
-                : "absolute top-4 left-1/2 transform -translate-x-1/2 scale-100"
-            }`}
-          >
-            <div
-              className={`relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-8 py-6 rounded-xl shadow-2xl backdrop-blur-sm mx-auto ${
-                showFinalScore ? "w-80" : "w-80"
-              }`}
-            >
+          </div>
+
+          {/* Scoreboard - colonne de droite (plus d'espace) */}
+          <div className="absolute top-0 right-0 w-[calc(100%-5rem)] h-full">
+            <div className="absolute top-4 right-4 left-4 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white p-3 rounded-xl shadow-2xl backdrop-blur-sm">
               {/* Effet holographique de fond */}
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse"></div>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.2),transparent_50%)] rounded-xl"></div>
               <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse"></div>
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
 
-              <div className="relative flex flex-col gap-2 items-center justify-center">
+              <div className="relative flex flex-col gap-3 items-center justify-center">
                 {!showFinalScore ? (
                   <>
-                    <div className="flex gap-16 items-center">
+                    <div className="flex gap-8 items-center">
                       <div className="text-center">
                         <div
-                          className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                          className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
                           style={{ fontFamily: "Shutteblock, monospace" }}
                         >
                           {timeLeft}s
@@ -741,7 +697,7 @@ const CubeGame = () => {
                       </div>
                       <div className="text-center">
                         <div
-                          className="text-xl sm:text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                          className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
                           style={{ fontFamily: "Shutteblock, monospace" }}
                         >
                           {score}
@@ -755,28 +711,28 @@ const CubeGame = () => {
                 ) : (
                   <div className="text-center">
                     <div
-                      className="text-xl sm:text-3xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
+                      className="text-xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
                       style={{ fontFamily: "Shutteblock, monospace" }}
                     >
                       Good job!
                     </div>
                     <div
-                      className="text-lg sm:text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                      className="text-lg font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
                       style={{ fontFamily: "Shutteblock, monospace" }}
                     >
                       {score} targets in 30s
                     </div>
-                    <div className="flex flex-col gap-3 sm:gap-4 justify-center w-full mt-4">
+                    <div className="flex flex-col gap-3 justify-center w-full mt-4">
                       <button
                         onClick={handleReset}
-                        className="bg-orange-500 text-white w-full px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm sm:text-base touch-manipulation"
+                        className="bg-orange-500 text-white w-full px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-sm touch-manipulation"
                         aria-label="Play Again"
                       >
                         Play Again
                       </button>
                       <button
                         onClick={() => (window.location.href = "/")}
-                        className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-4 py-3 rounded-full font-bold shadow-lg text-sm sm:text-base touch-manipulation"
+                        className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-4 py-3 rounded-full font-bold shadow-lg text-sm touch-manipulation"
                         aria-label="Retour à l'accueil"
                       >
                         ← Back
@@ -787,7 +743,92 @@ const CubeGame = () => {
               </div>
             </div>
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Scoreboard desktop uniquement */}
+      {gameStarted && (
+        <div
+          className={`z-40 transition-all duration-1000 px-2 hidden sm:block ${
+            showFinalScore
+              ? "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-110"
+              : "absolute top-4 left-1/2 transform -translate-x-1/2 scale-100"
+          }`}
+        >
+          <div
+            className={`relative bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 border border-orange-400/50 text-white px-8 py-6 rounded-xl shadow-2xl backdrop-blur-sm mx-auto ${
+              showFinalScore ? "w-80" : "w-80"
+            }`}
+          >
+            {/* Effet holographique de fond */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-yellow-500/10 rounded-xl animate-pulse"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,165,0,0.2),transparent_50%)] rounded-xl"></div>
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-pulse"></div>
+
+            <div className="relative flex flex-col gap-2 items-center justify-center">
+              {!showFinalScore ? (
+                <>
+                  <div className="flex gap-16 items-center">
+                    <div className="text-center">
+                      <div
+                        className="text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                        style={{ fontFamily: "Shutteblock, monospace" }}
+                      >
+                        {timeLeft}s
+                      </div>
+                      <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                        TIME
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div
+                        className="text-4xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                        style={{ fontFamily: "Shutteblock, monospace" }}
+                      >
+                        {score}
+                      </div>
+                      <div className="text-xs font-bold text-orange-300 mt-1 drop-shadow-[0_0_5px_rgba(255,165,0,0.3)]">
+                        TARGETS
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <div
+                    className="text-3xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)] mb-2"
+                    style={{ fontFamily: "Shutteblock, monospace" }}
+                  >
+                    Good job!
+                  </div>
+                  <div
+                    className="text-2xl font-black tracking-wider drop-shadow-[0_0_10px_rgba(255,165,0,0.5)]"
+                    style={{ fontFamily: "Shutteblock, monospace" }}
+                  >
+                    {score} targets in 30s
+                  </div>
+                  <div className="flex flex-col gap-4 justify-center w-full mt-4">
+                    <button
+                      onClick={handleReset}
+                      className="bg-orange-500 text-white w-full px-4 py-3 rounded-full font-bold hover:bg-orange-600 transition-colors border border-orange-500 shadow-lg text-base touch-manipulation"
+                      aria-label="Play Again"
+                    >
+                      Play Again
+                    </button>
+                    <button
+                      onClick={() => (window.location.href = "/")}
+                      className="border border-orange-500 text-orange-400 bg-transparent hover:bg-orange-500 hover:text-white transition-colors w-full px-4 py-3 rounded-full font-bold shadow-lg text-base touch-manipulation"
+                      aria-label="Retour à l'accueil"
+                    >
+                      ← Back
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {showPrompt && (
