@@ -861,7 +861,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
           </div>
 
           {/* Affichage du jeu (desktop uniquement) */}
-          <div className="absolute top-4 sm:top-6 left-0 right-0 mx-auto z-40 bg-black bg-opacity-90 text-white p-2 sm:p-4 rounded-xl border border-orange-500 w-[96vw] max-w-[420px] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:w-auto sm:max-w-[90vw] py-2 sm:py-0 hidden sm:block">
+          <div className="absolute top-4 sm:top-6 left-0 right-0 mx-auto z-40 bg-black bg-opacity-90 text-white p-2 sm:p-4 rounded-xl border border-orange-500 w-[96vw] max-w-[420px] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:w-auto sm:max-w-[60vw] py-2 sm:py-0 hidden sm:block">
             <div className="text-center">
               <div className="text-base sm:text-lg font-bold text-orange-400 mb-2 sm:mb-3">
                 Frame {currentRoll} / 5

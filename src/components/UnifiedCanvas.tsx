@@ -496,11 +496,17 @@ const NavigationDots: React.FC<{
 const Logo: React.FC = () => {
   return (
     <div className="fixed top-4 left-4 md:top-8 md:left-8 z-50">
-      <img
-        src={logoJN}
-        alt="Jeremy Naphay Logo"
-        className="h-8 md:h-10 w-auto opacity-80 hover:opacity-100 transition-opacity duration-300"
-      />
+      <a
+        href="/"
+        className="block cursor-pointer"
+        aria-label="Retour à l'accueil"
+      >
+        <img
+          src={logoJN}
+          alt="Jeremy Naphay Logo"
+          className="h-8 md:h-10 w-auto opacity-80 hover:opacity-100 transition-opacity duration-300"
+        />
+      </a>
     </div>
   );
 };
