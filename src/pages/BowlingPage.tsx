@@ -728,7 +728,7 @@ const BowlingPage: React.FC<BowlingPageProps> = ({ onBack }) => {
                     <p className="text-white font-medium leading-relaxed">
                       <span className="text-orange-300 font-bold">
                         Knock down all the pins
-                      </span>
+                      </span>{" "}
                       for a strike&nbsp;!
                     </p>
                   </div>

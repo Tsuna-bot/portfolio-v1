@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><style>
+    #light-icon {
+      display: inline;
+    }
+    #dark-icon {
+      display: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #light-icon {
+        display: none;
+      }
+      #dark-icon {
+        display: inline;
+      }
+    }
+  </style><g id="light-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1302)"><rect width="1000" height="1000" fill="#000000"></rect><g transform="matrix(3.608805485384338,0,0,3.608805485384338,100,290.47275351858536)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="221.68" height="116.12"><svg id="Calque_2" data-name="Calque 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 221.68 116.12">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  <clipPath id="SvgjsClipPath1302"><rect width="1000" height="1000" x="0" y="0" rx="150" ry="150"></rect></clipPath></defs>
+  <g id="Calque_1-2" data-name="Calque 1">
+    <polygon class="cls-1" points="221.68 0 221.68 116.12 206.75 116.12 116.12 25.48 116.12 116.12 0 116.12 0 95 95 95 95 0 120.49 0 200.56 80.07 200.56 0 221.68 0"></polygon>
+  </g>
+</svg></svg></g></g></svg></g><g id="dark-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g><g transform="matrix(4.511006856730422,0,0,4.511006856730422,0,238.09094189823168)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="221.68" height="116.12"><svg id="Calque_2" data-name="Calque 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 221.68 116.12">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="Calque_1-2" data-name="Calque 1">
+    <polygon class="cls-1" points="221.68 0 221.68 116.12 206.75 116.12 116.12 25.48 116.12 116.12 0 116.12 0 95 95 95 95 0 120.49 0 200.56 80.07 200.56 0 221.68 0"></polygon>
+  </g>
+</svg></svg></g></g></svg></g></svg>
